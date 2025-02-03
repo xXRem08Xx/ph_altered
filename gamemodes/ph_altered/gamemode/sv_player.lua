@@ -602,10 +602,35 @@ end
 function GM:KeyPress(ply, key)
 	if ply:Alive() then
 		if key == IN_ATTACK then
+			if ply:GetNWBool("propFixed", false) then
+				ply:ChatPrint("Vous êtes fixé en place. Faites un clic droit pour annuler la fixation.")
+				return
+			end
 			self:PlayerDisguise(ply)
+		elseif key == IN_ATTACK2 then
+			if ply:IsDisguised() and not ply:IsHunter() then
+				if ply:GetNWBool("propFixed", false) then
+					ply:SetNWBool("propFixed", false)
+					ply:SetMoveType(MOVETYPE_WALK)
+					ply:CalculateSpeed()
+					ply:ChatPrint("Prop défixé, vous pouvez vous déplacer.")
+					print("[DirectModification] Prop unfixed for " .. ply:Nick())
+				else
+					ply:SetNWBool("propFixed", true)
+					ply:SetMoveType(MOVETYPE_NONE)
+					ply:ChatPrint("Prop fixé en place.")
+					print("[DirectModification] Prop fixed for " .. ply:Nick())
+				end
+			end
 		end
 	end
 end
+
+
+
+
+
+
 
 function GM:PlayerSwitchFlashlight(ply)
 	if ply:IsDisguised() then

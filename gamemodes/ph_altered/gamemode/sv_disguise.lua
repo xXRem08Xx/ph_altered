@@ -3,11 +3,10 @@ include("sh_disguise.lua")
 local PlayerMeta = FindMetaTable("Player")
 
 function GM:PlayerDisguise(ply)
-	print("[DirectModification] PlayerDisguise called for " .. ply:Nick())
-	if ply:IsHunter() then
-		print("[DirectModification] Player is hunter; skipping disguise.")
+	if ply:GetNWBool("propFixed", false) or ply:IsHunter() then
 		return
 	end
+	print("[DirectModification] PlayerDisguise called for " .. ply:Nick())
 	if GetConVar("ph_props_random_change"):GetBool() then
 		local limit = GetConVar("ph_random_prop_limit"):GetInt() or 3
 		local used = ply:GetNWInt("randomPropUses", 0)
