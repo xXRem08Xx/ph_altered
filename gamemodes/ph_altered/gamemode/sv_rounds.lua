@@ -123,6 +123,7 @@ function GM:SetupRound()
 			ply:SetNWInt("randomPropUses", 0)
 			ply.RandomPropList = {}
 			ply.RandomPropIndex = 0
+			ply:SetNWBool("propFixed", false)
 			local col = team.GetColor(ply:Team())
 			ply:SetPlayerColor(Vector(col.r / 255, col.g / 255, col.b / 255))
 			if ply:IsHunter() then
