@@ -4,7 +4,7 @@
 ![Steam Favorites](https://img.shields.io/steam/favorites/3028430983?style=for-the-badge&color=yellow)
 <a href='https://ko-fi.com/M4M2VL6WW' target='_blank'><img height='29' style='border:0px;height:29px;' src='https://storage.ko-fi.com/cdn/brandasset/kofi_button_dark.png' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>  
 This is a fork of [Zikaeroh's Prop Hunters - Huskles Edition](https://github.com/zikaeroh/husklesph), intended to add a few features and customizations
-![alt text](https://github.com/DataNext27/ultimateph/blob/652c8b334baabaed13d9cc7680aad64678b2aacb/gamemodes/ultimateph/logo.png)
+![alt text](https://github.com/DataNext27/ph_altered/blob/652c8b334baabaed13d9cc7680aad64678b2aacb/gamemodes/ph_altered/logo.png)
 
 >ULX & MapVote compatible</br>
 
@@ -20,10 +20,10 @@ This is a fork of [Zikaeroh's Prop Hunters - Huskles Edition](https://github.com
 - You can make props be in thirdperson when undisguised
 
 ## Configurations
-To help configure the addon on server, there is the [wiki](https://github.com/DataNext27/ultimateph/wiki)</br>
-There is a bunch of new commands, [see here](https://github.com/DataNext27/ultimateph/wiki/Commands) </br>
-To add taunts, [see here](https://github.com/DataNext27/ultimateph/wiki/Taunts) </br>
-To add models, [see here](https://github.com/DataNext27/ultimateph/wiki/Models)
+To help configure the addon on server, there is the [wiki](https://github.com/DataNext27/ph_altered/wiki)</br>
+There is a bunch of new commands, [see here](https://github.com/DataNext27/ph_altered/wiki/Commands) </br>
+To add taunts, [see here](https://github.com/DataNext27/ph_altered/wiki/Taunts) </br>
+To add models, [see here](https://github.com/DataNext27/ph_altered/wiki/Models)
 
 ## Contributors
 
