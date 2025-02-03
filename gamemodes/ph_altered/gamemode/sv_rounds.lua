@@ -105,32 +105,29 @@ end
 function GM:SetupRound()
 	local c = 0
 	for k, ply in pairs(player.GetAll()) do
-		if !ply:IsSpectator() then -- ignore spectators
+		if not ply:IsSpectator() then
 			c = c + 1
 		end
 	end
-
 	if c < 2 then
 		GlobalChatMsg("Not enough players to start round")
 		self:SetGameState(ROUND_WAIT)
 		return
 	end
-
 	self:BalanceTeams()
-
 	for k, ply in pairs(player.GetAll()) do
-		if !ply:IsSpectator() then -- ignore spectators
+		if not ply:IsSpectator() then
 			ply:SetNWBool("RoundInGame", true)
 			ply:KillSilent()
 			ply:Spawn()
-
+			ply:SetNWInt("randomPropUses", 0)
+			ply.RandomPropList = {}
+			ply.RandomPropIndex = 0
 			local col = team.GetColor(ply:Team())
 			ply:SetPlayerColor(Vector(col.r / 255, col.g / 255, col.b / 255))
-
 			if ply:IsHunter() then
 				ply:Freeze(true)
 			end
-
 			ply.PropDmgPenalty = 0
 			ply.PropMovement = 0
 			ply.HunterKills = 0
@@ -142,18 +139,14 @@ function GM:SetupRound()
 			ply:SetNWBool("RoundInGame", false)
 		end
 	end
-
 	self:CleanupMap()
 	self.Rounds = self.Rounds + 1
-
 	if self.Rounds == self.RoundLimit:GetInt() then
 		GlobalChatMsg(Color(255, 0, 0), "This is the LAST ROUND!")
-
 		if self.Secrets:GetBool() then
 			BroadcastLua("surface.PlaySound('husklesph/hphaaaaa2.mp3')")
 		end
 	end
-
 	hook.Run("OnSetupRound")
 	self:SetGameState(ROUND_HIDE)
 end

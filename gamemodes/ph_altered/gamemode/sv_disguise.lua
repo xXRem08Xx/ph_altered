@@ -4,19 +4,21 @@ local PlayerMeta = FindMetaTable("Player")
 
 function GM:PlayerDisguise(ply)
 	print("[DirectModification] PlayerDisguise called for " .. ply:Nick())
-	local randomMode = GetConVar("ph_random_prop_mode"):GetBool()
-	if randomMode then
+	if ply:IsHunter() then
+		print("[DirectModification] Player is hunter; skipping disguise.")
+		return
+	end
+	if GetConVar("ph_props_random_change"):GetBool() then
 		local limit = GetConVar("ph_random_prop_limit"):GetInt() or 3
 		local used = ply:GetNWInt("randomPropUses", 0)
-		if used >= limit then
-			ply:ChatPrint("Maximum random prop changes reached!")
-			print("[DirectModification] Maximum random prop changes reached for " .. ply:Nick())
-			return
+		if not ply.RandomPropList then
+			ply.RandomPropList = {}
+			ply.RandomPropIndex = 0
 		end
-		print("[DirectModification] Random mode active for " .. ply:Nick())
-		local range = 10000
+		local currentModel = ply:GetNWString("disguiseModel", "")
+		local newProp = nil
+		local range = 20000
 		local pos = ply:GetPos()
-		print("[DirectModification] Player position: " .. tostring(pos) .. ", search range: " .. range)
 		local props = {}
 		local allowClasses = {"prop_physics", "prop_physics_multiplayer"}
 		for _, ent in ipairs(ents.FindInSphere(pos, range)) do
@@ -24,19 +26,53 @@ function GM:PlayerDisguise(ply)
 				table.insert(props, ent)
 			end
 		end
-		print("[DirectModification] " .. #props .. " allowed props found for " .. ply:Nick())
+		print("[DirectModification] Found " .. #props .. " allowed props for " .. ply:Nick())
 		if #props == 0 then
-			ply:ChatPrint("No prop found nearby!")
+			ply:ChatPrint("Aucun prop trouvé à proximité!")
 			print("[DirectModification] No allowed prop found for " .. ply:Nick())
 			return
 		end
-		local randomProp = table.Random(props)
-		print("[DirectModification] Random prop selected: " .. tostring(randomProp))
-		ply:ChatPrint("Random prop selected! (" .. (limit - used - 1) .. " changes remaining)")
-		ply:SetNWInt("randomPropUses", used + 1)
-		ply:DisguiseAsProp(randomProp)
-		ply.LastDisguise = CurTime()
-		print("[DirectModification] Disguise completed for " .. ply:Nick())
+		if used < limit then
+			newProp = table.Random(props)
+			if newProp:GetModel() == currentModel and currentModel ~= "" then
+				ply:ChatPrint("Déjà déguisé sur ce modèle, changement non compté.")
+				print("[DirectModification] Same model as current, aborting change for " .. ply:Nick())
+				return
+			end
+			ply:DisguiseAsProp(newProp)
+			if ply:IsDisguised() then
+				if not table.HasValue(ply.RandomPropList, newProp) then
+					table.insert(ply.RandomPropList, newProp)
+				end
+				ply:SetNWInt("randomPropUses", used + 1)
+				ply.LastDisguise = CurTime()
+				ply:ChatPrint("Changement réussi! (" .. (limit - ply:GetNWInt("randomPropUses", 0)) .. " changements restants)")
+				print("[DirectModification] Disguise succeeded for " .. ply:Nick())
+			else
+				ply:ChatPrint("Transformation échouée, changement non compté.")
+				print("[DirectModification] Disguise failed for " .. ply:Nick())
+			end
+		else
+			if #ply.RandomPropList == 0 then
+				newProp = table.Random(props)
+				table.insert(ply.RandomPropList, newProp)
+			else
+				ply.RandomPropIndex = (ply.RandomPropIndex or 0) + 1
+				if ply.RandomPropIndex > #ply.RandomPropList then
+					ply.RandomPropIndex = 1
+				end
+				newProp = ply.RandomPropList[ply.RandomPropIndex]
+			end
+			ply:DisguiseAsProp(newProp)
+			if ply:IsDisguised() then
+				ply.LastDisguise = CurTime()
+				ply:ChatPrint("Changement réussi en mode cyclique!")
+				print("[DirectModification] Cyclic disguise succeeded for " .. ply:Nick())
+			else
+				ply:ChatPrint("Transformation échouée en mode cyclique!")
+				print("[DirectModification] Cyclic disguise failed for " .. ply:Nick())
+			end
+		end
 	else
 		local canDisguise, target = self:PlayerCanDisguiseCurrentTarget(ply)
 		if not canDisguise then
@@ -47,7 +83,6 @@ function GM:PlayerDisguise(ply)
 			print("[DirectModification] Cooldown active for disguise for " .. ply:Nick())
 			return
 		end
-		print("[DirectModification] Random mode not active, using targeted prop for " .. ply:Nick())
 		ply:DisguiseAsProp(target)
 		ply.LastDisguise = CurTime()
 		print("[DirectModification] Disguise completed for " .. ply:Nick())
