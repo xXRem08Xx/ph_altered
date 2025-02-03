@@ -1,7 +1,7 @@
 "ultimateph"
 {
 	"base"		"base"
-	"title"		"Prop Hunters - Ultimate Edition"
+	"title"		"PropHunt Altered"
 	"maps"		"^ph_"
 	"menusystem"	"1"
 	"workshopid"	"3028430983"
@@ -144,6 +144,22 @@
 			"help"		"Should props be in thirdperson when undisguised"
 			"type"		"CheckBox"
 			"default"	"0"
+		}
+		18
+		{
+			"name"		"ph_props_random_change"
+			"text"		"Random props"
+			"help"		"Should props be randons when selected"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
+		19
+		{
+			"name"		"ph_random_prop_limit"
+			"text"		"Number of random props allowed per round"
+			"help"		"Number of random props allowed per round"
+			"type"		"Numeric"
+			"default"	"3"
 		}
 	}
 }

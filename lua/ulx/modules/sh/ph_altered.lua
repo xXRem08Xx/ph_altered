@@ -145,6 +145,16 @@ commandToUlx("ph_auto_taunt", function(c)
     c:help("Enable/disable auto taunt.")
 end)
 
+commandToUlx("ph_random_prop_mode", function(c)
+    c:addParam{ type = ULib.cmds.BoolArg, hint = "enabled", ULib.cmds.optional }
+    c:help("Enable/disable random props.")
+end)
+
+commandToUlx("ph_random_prop_limit", function(c)
+    c:addParam{ type = ULib.cmds.BoolArg, hint = "enabled", ULib.cmds.optional }
+    c:help("Number of random props allowed per round.")
+end)
+
 function ulx.ph_alteredAutoTauntDelay(calling_ply, minimum, maximum)
     if minimum > maximum then
         minimum = maximum

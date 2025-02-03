@@ -1,5 +1,5 @@
 {
-    "title":"Prop Hunters - Ultimate Edition",
+    "title":"PropHunt Altered",
     "type":"gamemode",
     "tags":["fun"],
     "ignore":[".*", ".vscode", "README.md", ".gitignore", "gamemodes/ph_altered/gamemode/models/how-to-add-new-models.txt", "gamemodes/ph_altered/gamemode/taunts/how-to-add-new-taunts.txt"]

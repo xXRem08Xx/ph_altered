@@ -10,14 +10,14 @@ GM.HidingTime = CreateConVar("ph_hidingtime", 30, bit.bor(FCVAR_ARCHIVE, FCVAR_N
 GM.PostRoundTime = CreateConVar("ph_postroundtime", 15, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Time before next round after end of the round")
 GM.MapTimeLimit = CreateConVar("ph_map_time_limit", -1, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Minutes before declaring the next round to be the last round (-1 to disable)")
 
-GM.HunterDamagePenalty = CreateConVar("ph_hunter_dmgpenalty", 3, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Amount of damage a hunter should take for shooting an incorrect prop")
+GM.HunterDamagePenalty = CreateConVar("ph_hunter_dmgpenalty", 5, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Amount of damage a hunter should take for shooting an incorrect prop")
 GM.HunterGrenadeAmount = CreateConVar("ph_hunter_smggrenades", 1, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Amount of SMG grenades hunters should spawn with")
 GM.HunterDeafOnHiding = CreateConVar("ph_hunter_deaf_onhiding", 1, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Set if hunters can hear while props are hiding (during black screen)")
 GM.HunterAimRay = CreateConVar("ph_hunter_aim_laser", 0, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "0 for none, 1 for spectators, 2 for props and spectators")
 
 GM.PropsWinStayProps = CreateConVar("ph_props_onwinstayprops", 0, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "If the props win, they stay on the props team")
 GM.PropsSmallSize = CreateConVar("ph_props_small_size", 200, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Size that speed penalty for small size starts to apply (0 to disable)")
-GM.PropsJumpPower = CreateConVar("ph_props_jumppower", 1.2, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Jump power bonus for when props are disguised")
+GM.PropsJumpPower = CreateConVar("ph_props_jumppower", 1.4, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Jump power bonus for when props are disguised")
 GM.PropsCamDistance = CreateConVar("ph_props_camdistance", 1, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "The camera distance multiplier for props when disguised")
 GM.PropsSilentFootsteps = CreateConVar("ph_props_silent_footsteps", 0, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Does props emit footsteps sounds while moving")
 GM.PropTpose = CreateConVar("ph_props_tpose", 0, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Should props be fully animated or Tpose")
@@ -33,3 +33,6 @@ GM.AutoTauntMax = CreateConVar("ph_auto_taunt_delay_max", 120, bit.bor(FCVAR_ARC
 GM.AutoTauntPropsOnly = CreateConVar("ph_auto_taunt_props_only", 1, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Enable auto taunt for props only")
 
 GM.Secrets =  CreateConVar("ph_secrets", 0, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Enable secrets")
+
+GM.RandomChangeProps = CreateConVar("ph_random_prop_mode", 0, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Enable random prop mode")
+GM.RandomPropLimit = CreateConVar("ph_random_prop_limit", 3, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Number of random props allowed per round")
