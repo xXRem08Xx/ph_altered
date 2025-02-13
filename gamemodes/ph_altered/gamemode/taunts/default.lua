@@ -126,3 +126,141 @@ addTaunt("Drop Plates", {
 addTaunt("Radio", {
 	"music/radio1.mp3"
 }, "props", nil, {"music"}, 39)
+
+-- ajout 
+
+addTaunt("Among Us", {
+	"../../../../sound/taunt/among_us.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Call An Ambulance Not For Me", {
+	"../../../../sound/taunt/call_an-ambulance-not-for-me.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Cat", {
+	"../../../../sound/taunt/cat.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Classic Hurt", {
+	"../../../../sound/taunt/classic_hurt.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Dry Fart", {
+	"../../../../sound/taunt/dry_fart.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Ecore Ca Fait Beaucoup La Non", {
+	"../../../../sound/taunt/ecore_ca-fait-beaucoup-la-non.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Fart Reverb", {
+	"../../../../sound/taunt/fart_reverb.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Frappe Moi Je Tempoisonne", {
+	"../../../../sound/taunt/frappe_moi-je-tempoisonne.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Gas Gas Gas", {
+	"../../../../sound/taunt/gas_gas-gas.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Hello There", {
+	"../../../../sound/taunt/hello_there.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Honteux", {
+	"../../../../sound/taunt/Honteux.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Jeanne Final", {
+	"../../../../sound/taunt/jeanne_final.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Je Suis Bien", {
+	"../../../../sound/taunt/je_suis-bien.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Je Vais Te Faire Courir", {
+	"../../../../sound/taunt/je_vais_te_faire_courir.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Le Cri De Léo", {
+	"../../../../sound/taunt/le_cri-de-leo.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Le Rat Proche De L'homme", {
+	"../../../../sound/taunt/le_rat-proche-de-lhomme.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Mais Laisse Moi Dormir Zebi", {
+	"../../../../sound/taunt/mais_laisse-moi-dormir-zebi.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Meow", {
+	"../../../../sound/taunt/meow.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Mon Gros Front", {
+	"../../../../sound/taunt/Mon_gros-front.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("On Me Voit", {
+	"../../../../sound/taunt/on_me-voit.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Ouais C'est Greg", {
+	"../../../../sound/taunt/ouais_cest-greg.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Philipeee", {
+	"../../../../sound/taunt/philipeee.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("President De Tous", {
+	"../../../../sound/taunt/president_de-tous.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Rehehehe", {
+	"../../../../sound/taunt/rehehehe.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("RickRoll", {
+	"../../../../sound/taunt/RickRoll.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Salepute", {
+	"../../../../sound/taunt/salepute.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("T'es Nul", {
+	"../../../../sound/taunt/T'es_Nul.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Tindeck", {
+	"../../../../sound/taunt/tindeck.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Ton Flingue", {
+	"../../../../sound/taunt/Ton_flingue.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Une Tuile", {
+	"../../../../sound/taunt/Une_Tuile.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Weeeeee", {
+	"../../../../sound/taunt/Weeeeee.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Why Are You Gay", {
+	"../../../../sound/taunt/why_are-you-gay.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Why Are Y", {
+	"../../../../sound/taunt/why_are_y.mp3"
+}, "props", "male", {"talk"})
+
+addTaunt("Women Haha", {
+	"../../../../sound/taunt/women_haha.mp3"
+}, "props", "male", {"talk"})
