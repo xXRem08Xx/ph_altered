@@ -185,6 +185,31 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}
+		23
+		{
+			"name"		"ph_props_camdistance_mult"
+			"text"		"Prop Camera Distance Multiplier"
+			"help"		"The camera distance multiplier for props when disguised"
+			"type"		"Numeric"
+			"default"	"1"
+		}
+		24
+		{
+			"name"		"ph_props_camdistance_min"
+			"text"		"Props Minimum Camera Distance"
+			"help"		"The minimum camera distance for props when disguised"
+			"type"		"Numeric"
+			"default"	"60"
+		}
+		25
+		{
+			"name"		"ph_props_camdistance_max"
+			"text"		"Props Maximum Camera Distance"
+			"help"		"The maximum camera distance for props when disguised"
+			"type"		"Numeric"
+			"default"	"160"
+		}
 	}
 }
+
 
