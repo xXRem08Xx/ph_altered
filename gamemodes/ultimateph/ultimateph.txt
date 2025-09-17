@@ -145,5 +145,46 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}
+		18
+		{
+			"name"		"ph_walk_speed"
+			"text"		"Walk Speed"
+			"help"		"Default Walk Speed for hunters and props."
+			"type"		"Numeric"
+			"default"	"200"
+		}
+		19
+		{
+			"name"		"ph_run_speed"
+			"text"		"Run Speed"
+			"help"		"Default Run Speed for hunters and props."
+			"type"		"Numeric"
+			"default"	"150"
+		}
+		20
+		{
+			"name"		"ph_jump_power"
+			"text"		"Jump Power"
+			"help"		"Default Jump Power for hunters and props."
+			"type"		"Numeric"
+			"default"	"200"
+		}
+		21
+		{
+			"name"		"ph_falldmg_mult"
+			"text"		"Fall Damage multiplier"
+			"help"		"Default Fall Damage multiplier for hunters and props."
+			"type"		"Numeric"
+			"default"	"50"
+		}
+		22
+		{
+			"name"		"ph_falldmg_nonlethal"
+			"text"		"Non-Lethal Fall Damage"
+			"help"		"If set, fall damage will not take players below one health."
+			"type"		"CheckBox"
+			"default"	"0"
+		}
 	}
 }
+
