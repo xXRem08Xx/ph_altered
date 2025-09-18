@@ -223,6 +223,7 @@ function GM:EndRound(winningTeam)
 				winnerName = result:Nick(),
 				winnerTeam = result:Team()
 			}
+			hook.Run("PHAward", result, award)
 		else
 			ErrorNoHalt("ULTIMATEPH WARNING: EndRound Player Award gave non Player object: " .. type(result))
 		end
@@ -323,3 +324,4 @@ local function ForceEndRound(ply, command, args)
 	end
 end
 concommand.Add("ph_endround", ForceEndRound)
+
