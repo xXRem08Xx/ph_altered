@@ -36,8 +36,8 @@ GM.AutoTauntPropsOnly = CreateConVar("ph_auto_taunt_props_only", 1, bit.bor(FCVA
 
 GM.Secrets =  CreateConVar("ph_secrets", 0, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Enable secrets")
 
-GM.WalkSpeed = CreateConVar("ph_walk_speed", 200, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Walk Speed")
-GM.RunSpeed = CreateConVar("ph_run_speed", 150, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Run Speed")
+GM.WalkSpeed = CreateConVar("ph_walk_speed", 250, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Walk Speed")
+GM.RunSpeed = CreateConVar("ph_run_speed", 50, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Run Speed") -- Lower than walk speed so you walk even slower but without emitting footsteps
 GM.JumpPower = CreateConVar("ph_jump_power", 200, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Jump Power")
 GM.FallDMGMult = CreateConVar("ph_falldmg_mult", 50, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Adjust fall damage")
 GM.FallDMGNonLethal = CreateConVar("ph_falldmg_nonlethal", 0, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Should fall damage kill")

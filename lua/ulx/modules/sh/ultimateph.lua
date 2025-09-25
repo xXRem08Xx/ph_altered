@@ -156,12 +156,12 @@ commandToUlx("ph_auto_taunt", function(c)
 end)
 
 commandToUlx("ph_walk_speed", function(c)
-    c:addParam{ type = ULib.cmds.NumArg, default = 200, min = 10, max = 1000, hint = "walk", ULib.cmds.optional }
+    c:addParam{ type = ULib.cmds.NumArg, default = 250, min = 10, max = 1000, hint = "walk", ULib.cmds.optional }
     c:help("Set the default walk speed for hunters and props.")
 end)
 
 commandToUlx("ph_run_speed", function(c)
-    c:addParam{ type = ULib.cmds.NumArg, default = 150, min = 10, max = 1000, hint = "run", ULib.cmds.optional }
+    c:addParam{ type = ULib.cmds.NumArg, default = 50, min = 10, max = 1000, hint = "run", ULib.cmds.optional }
     c:help("Set the default run speed for hunters and props.")
 end)
 
