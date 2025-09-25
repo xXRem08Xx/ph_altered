@@ -62,7 +62,7 @@ function GM:PlayerSetHull(ply, hullx, hully, hullz, duckz)
 end
 
 function GM:EntityEmitSound( t )
-	if not GetConVar("ph_hunter_deaf_onhiding"):GetBool() --[[ or self:GetGameState() ~= ROUND_HIDE ]] then
+	if not GetConVar("ph_hunter_deaf_onhiding"):GetBool() or self:GetGameState() ~= ROUND_HIDE then
 		return
 	end
 
