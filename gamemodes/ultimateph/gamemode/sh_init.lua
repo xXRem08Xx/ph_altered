@@ -18,7 +18,9 @@ GM.HunterAimRay = CreateConVar("ph_hunter_aim_laser", 0, bit.bor(FCVAR_ARCHIVE, 
 GM.PropsWinStayProps = CreateConVar("ph_props_onwinstayprops", 0, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "If the props win, they stay on the props team")
 GM.PropsSmallSize = CreateConVar("ph_props_small_size", 200, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Size that speed penalty for small size starts to apply (0 to disable)")
 GM.PropsJumpPower = CreateConVar("ph_props_jumppower", 1.2, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Jump power bonus for when props are disguised")
-GM.PropsCamDistance = CreateConVar("ph_props_camdistance", 1, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "The camera distance multiplier for props when disguised")
+GM.PropsCamDistanceMult = CreateConVar("ph_props_camdistance_mult", 1, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "The camera distance multiplier for props when disguised")
+GM.PropsCamDistanceMin = CreateConVar("ph_props_camdistance_min", 60, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "The minimum camera distance for props when disguised")
+GM.PropsCamDistanceMax = CreateConVar("ph_props_camdistance_max", 160, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "The maximum camera distance for props when disguised")
 GM.PropsSilentFootsteps = CreateConVar("ph_props_silent_footsteps", 0, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Does props emit footsteps sounds while moving")
 GM.PropTpose = CreateConVar("ph_props_tpose", 0, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Should props be fully animated or Tpose")
 GM.PropUndisguisedThirdperson = CreateConVar("ph_props_undisguised_thirdperson", 0, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Should props start in thirdperson")
@@ -33,3 +35,10 @@ GM.AutoTauntMax = CreateConVar("ph_auto_taunt_delay_max", 120, bit.bor(FCVAR_ARC
 GM.AutoTauntPropsOnly = CreateConVar("ph_auto_taunt_props_only", 1, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Enable auto taunt for props only")
 
 GM.Secrets =  CreateConVar("ph_secrets", 0, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Enable secrets")
+
+GM.WalkSpeed = CreateConVar("ph_walk_speed", 250, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Walk Speed")
+GM.RunSpeed = CreateConVar("ph_run_speed", 50, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Run Speed") -- Lower than walk speed so you walk even slower but without emitting footsteps
+GM.JumpPower = CreateConVar("ph_jump_power", 200, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Jump Power")
+GM.FallDMGMult = CreateConVar("ph_falldmg_mult", 50, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Adjust fall damage")
+GM.FallDMGNonLethal = CreateConVar("ph_falldmg_nonlethal", 0, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Should fall damage kill")
+

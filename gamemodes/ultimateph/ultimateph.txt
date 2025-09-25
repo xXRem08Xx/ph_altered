@@ -76,8 +76,8 @@
 		9
 		{
 			"name"		"ph_dead_canroam"
-			"text"		"Use roam spectate mode"
-			"help"		"Can dead players use the roam spectate mode"
+			"text"		"Allow spectators to roam"
+			"help"		"Can dead players/spectators roam freely around the map"
 			"type"		"CheckBox"
 			"default"	"0"
 		}
@@ -132,7 +132,7 @@
 		16
 		{
 			"name"		"ph_props_tpose"
-			"text"		"Props Tpose"
+			"text"		"Props T-pose"
 			"help"		"Should props be in T pose"
 			"type"		"CheckBox"
 			"default"	"0"
@@ -140,8 +140,24 @@
 		17
 		{
 			"name"		"ph_props_undisguised_thirdperson"
-			"text"		"Props Undisguised Thirdperson"
+			"text"		"Props undisguised thirdperson"
 			"help"		"Should props be in thirdperson when undisguised"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
+		18
+		{
+			"name"		"ph_falldmg_mult"
+			"text"		"Fall damage multiplier"
+			"help"		"Default fall damage multiplier for hunters and props."
+			"type"		"Numeric"
+			"default"	"50"
+		}
+		19
+		{
+			"name"		"ph_falldmg_nonlethal"
+			"text"		"Non-lethal fall damage"
+			"help"		"If set, fall damage will not take players below one health."
 			"type"		"CheckBox"
 			"default"	"0"
 		}

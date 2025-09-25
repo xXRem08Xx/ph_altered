@@ -5,6 +5,7 @@ function GM:PlayerInitialSpawn(ply)
 	ply:SetTeam(team.BestAutoJoinTeam())
 
 	if self:GetGameState() != ROUND_WAIT then
+		ply:CSpectate()
 		timer.Simple(0, function()
 			if IsValid(ply) then
 				ply:KillSilent()
@@ -93,9 +94,9 @@ end
 function PlayerMeta:CalculateSpeed()
 	-- set the defaults
 	local settings = {
-		walkSpeed = 250,
-		runSpeed = 50,
-		jumpPower = 200,
+		walkSpeed = GAMEMODE.WalkSpeed:GetInt(),
+		runSpeed = GAMEMODE.RunSpeed:GetInt(),
+		jumpPower = GAMEMODE.JumpPower:GetInt(),
 		canRun = true,
 		canMove = true,
 		canJump = true
@@ -142,9 +143,11 @@ function GM:PlayerLoadout(ply)
 		ply:Give("weapon_crowbar")
 		ply:Give("weapon_smg1")
 		ply:Give("weapon_shotgun")
+		ply:Give("weapon_357")
 
 		ply:GiveAmmo(45 * 10, "SMG1")
 		ply:GiveAmmo(6 * 10, "buckshot")
+		ply:GiveAmmo(6 * 10, "357")
 		local amo = self.HunterGrenadeAmount:GetInt()
 		if amo > 0 then
 			ply:GiveAmmo(amo, "SMG1_Grenade")
@@ -504,6 +507,7 @@ end
 
 function GM:PlayerDeathThink(ply)
 	if self:CanRespawn(ply) then
+		ply:UnCSpectate()
 		ply:Spawn()
 	else
 		self:ChooseSpectatee(ply)

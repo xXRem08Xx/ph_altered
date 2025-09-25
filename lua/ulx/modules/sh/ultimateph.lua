@@ -100,9 +100,19 @@ commandToUlx("ph_props_jumppower", function(c)
     c:help("Set the jump power bonus for props.")
 end)
 
-commandToUlx("ph_props_camdistance", function(c)
+commandToUlx("ph_props_camdistance_mult", function(c)
     c:addParam{ type = ULib.cmds.NumArg, default = 1, min = 1, max = 10, hint = "distance", ULib.cmds.round, ULib.cmds.optional }
     c:help("Set the camera distance multiplier for disguised props.")
+end)
+
+commandToUlx("ph_props_camdistance_min", function(c)
+    c:addParam{ type = ULib.cmds.NumArg, default = 60, min = 1, max = 1000, hint = "mindistance", ULib.cmds.round, ULib.cmds.optional }
+    c:help("Set the camera minimum camera distance for props.")
+end)
+
+commandToUlx("ph_props_camdistance_max", function(c)
+    c:addParam{ type = ULib.cmds.NumArg, default = 160, min = 1, max = 1000, hint = "maxdistance", ULib.cmds.round, ULib.cmds.optional }
+    c:help("Set the camera maximum camera distance for props.")
 end)
 
 commandToUlx("ph_props_silent_footsteps", function(c)
@@ -145,6 +155,31 @@ commandToUlx("ph_auto_taunt", function(c)
     c:help("Enable/disable auto taunt.")
 end)
 
+commandToUlx("ph_walk_speed", function(c)
+    c:addParam{ type = ULib.cmds.NumArg, default = 250, min = 10, max = 1000, hint = "walk", ULib.cmds.optional }
+    c:help("Set the default walk speed for hunters and props.")
+end)
+
+commandToUlx("ph_run_speed", function(c)
+    c:addParam{ type = ULib.cmds.NumArg, default = 50, min = 10, max = 1000, hint = "run", ULib.cmds.optional }
+    c:help("Set the default run speed for hunters and props.")
+end)
+
+commandToUlx("ph_jump_power", function(c)
+    c:addParam{ type = ULib.cmds.NumArg, default = 200, min = 10, max = 1000, hint = "jump", ULib.cmds.optional }
+    c:help("Set the default jump power for hunters and props.")
+end)
+
+commandToUlx("ph_falldmg_mult", function(c)
+    c:addParam{ type = ULib.cmds.NumArg, default = 50, min = 0, max = 1000, hint = "falldmg", ULib.cmds.optional }
+    c:help("Adjust fall damage for hunters and props.")
+end)
+
+commandToUlx("ph_falldmg_nonlethal", function(c)
+    c:addParam{ type = ULib.cmds.BoolArg, hint = "enabled", ULib.cmds.optional }
+    c:help("Set fall damage lethality.")
+end)
+
 function ulx.ultimatephAutoTauntDelay(calling_ply, minimum, maximum)
     if minimum > maximum then
         minimum = maximum
@@ -170,3 +205,4 @@ end)
 commandToUlx("ph_endround", function(c)
     c:help("Ends the round on a tie.")
 end)
+
