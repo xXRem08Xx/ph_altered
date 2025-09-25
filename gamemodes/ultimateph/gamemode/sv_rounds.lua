@@ -122,6 +122,7 @@ function GM:SetupRound()
 		if !ply:IsSpectator() then -- ignore spectators
 			ply:SetNWBool("RoundInGame", true)
 			ply:KillSilent()
+			ply:UnCSpectate()
 			ply:Spawn()
 
 			local col = team.GetColor(ply:Team())
@@ -189,7 +190,7 @@ function GM:StartRound()
 	else
 		self.RoundSettings.RoundTime = math.Round((c * 0.5 / hunters + 60 * 4)  * math.sqrt(props / hunters))
 	end
-	self.RoundSettings.PropsCamDistance = self.PropsCamDistance:GetFloat()
+	self.RoundSettings.PropsCamDistanceMult = self.PropsCamDistanceMult:GetFloat()
 	print("Round time is " .. (self.RoundSettings.RoundTime / 60) .. " (" .. c .. " props)")
 	self:NetworkGameSettings()
 	self:SetGameState(ROUND_SEEK)
@@ -205,6 +206,9 @@ function GM:EndRound(winningTeam)
 
 	self.LastRoundResult = winningTeam
 
+	hook.Run("PH".. winningTeam, ply)
+	hook.Run("PHEndRound", ply)
+
 	local awards = {}
 	for awardKey, award in pairs(PlayerAwards) do -- PlayerAwards comes from sv_awards.lua
 		local result = award.getWinner()
@@ -212,13 +216,14 @@ function GM:EndRound(winningTeam)
 		-- nil values cannot exist in awards otherwise the net.WriteTable below will break
 		if !result then
 			continue
-		elseif type(result) == "Player" then
+		elseif type(result) == "Player" && IsValid(result) then
 			awards[awardKey] = {
 				name = award.name,
 				desc = award.desc,
 				winnerName = result:Nick(),
 				winnerTeam = result:Team()
 			}
+			hook.Run("PHAward", result, award)
 		else
 			ErrorNoHalt("ULTIMATEPH WARNING: EndRound Player Award gave non Player object: " .. type(result))
 		end
@@ -319,3 +324,4 @@ local function ForceEndRound(ply, command, args)
 	end
 end
 concommand.Add("ph_endround", ForceEndRound)
+

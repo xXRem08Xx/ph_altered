@@ -145,5 +145,71 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}
+		18
+		{
+			"name"		"ph_walk_speed"
+			"text"		"Walk Speed"
+			"help"		"Default Walk Speed for hunters and props."
+			"type"		"Numeric"
+			"default"	"200"
+		}
+		19
+		{
+			"name"		"ph_run_speed"
+			"text"		"Run Speed"
+			"help"		"Default Run Speed for hunters and props."
+			"type"		"Numeric"
+			"default"	"150"
+		}
+		20
+		{
+			"name"		"ph_jump_power"
+			"text"		"Jump Power"
+			"help"		"Default Jump Power for hunters and props."
+			"type"		"Numeric"
+			"default"	"200"
+		}
+		21
+		{
+			"name"		"ph_falldmg_mult"
+			"text"		"Fall Damage multiplier"
+			"help"		"Default Fall Damage multiplier for hunters and props."
+			"type"		"Numeric"
+			"default"	"50"
+		}
+		22
+		{
+			"name"		"ph_falldmg_nonlethal"
+			"text"		"Non-Lethal Fall Damage"
+			"help"		"If set, fall damage will not take players below one health."
+			"type"		"CheckBox"
+			"default"	"0"
+		}
+		23
+		{
+			"name"		"ph_props_camdistance_mult"
+			"text"		"Prop Camera Distance Multiplier"
+			"help"		"The camera distance multiplier for props when disguised"
+			"type"		"Numeric"
+			"default"	"1"
+		}
+		24
+		{
+			"name"		"ph_props_camdistance_min"
+			"text"		"Props Minimum Camera Distance"
+			"help"		"The minimum camera distance for props when disguised"
+			"type"		"Numeric"
+			"default"	"60"
+		}
+		25
+		{
+			"name"		"ph_props_camdistance_max"
+			"text"		"Props Maximum Camera Distance"
+			"help"		"The maximum camera distance for props when disguised"
+			"type"		"Numeric"
+			"default"	"160"
+		}
 	}
 }
+
+

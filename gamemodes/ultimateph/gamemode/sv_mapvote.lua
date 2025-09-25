@@ -131,6 +131,13 @@ function GM:StartMapVote()
 		return
 	end
 
+	-- allow developers to override builtin mapvote
+	if hook.GetTable().PHStartMapVote then
+		self:SetGameState(ROUND_MAPVOTE)
+			hook.Run("PHStartMapVote")
+		return
+	end
+
 	self.MapVoteStart = CurTime()
 	self.MapVoteTime = 30
 	self.MapVoting = true
@@ -243,3 +250,4 @@ concommand.Add("ph_votemap", function(ply, com, args)
 		GAMEMODE:NetworkMapVotes()
 	end
 end)
+
