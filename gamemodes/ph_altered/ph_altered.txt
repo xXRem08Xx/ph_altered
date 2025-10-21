@@ -1,181 +1,181 @@
-"ultimateph"
+"ph_altered"
 {
-	"base"		"base"
-	"title"		"PropHunt Altered"
-	"maps"		"^ph_"
-	"menusystem"	"1"
-	"workshopid"	"3028430983"
-	"version" 	"v1.3.1"
+	"base"        "base"
+	"title"       "PropHunt Altered"
+	"maps"        "^ph_"
+	"menusystem"  "1"
+	"workshopid"  "3028430983"
+	"version"     "v1.3.1"
+
 	"settings"
 	{
 		1
 		{
-			"name"		"ph_auto_team_balance"
-			"text"		"Auto balance teams"
-			"help"		"Automatically balance teams"
-			"type"		"CheckBox"
-			"default"	"1"
+			"name"     "ph_auto_team_balance"
+			"text"     "Auto balance teams"
+			"help"     "Automatically balance teams."
+			"type"     "CheckBox"
+			"default"  "1"
 		}
 		2
 		{
-			"name"		"ph_nb_hunter"
-			"text"		"Number of hunters"
-			"help"		"Set the number of hunters, works only if auto balance is disable"
-			"type"		"Numeric"
-			"default"	"2"
+			"name"     "ph_nb_hunter"
+			"text"     "Number of hunters"
+			"help"     "Set the number of hunters (only works if auto-balance is disabled)."
+			"type"     "Numeric"
+			"default"  "2"
 		}
 		3
 		{
-			"name"		"ph_roundlimit"
-			"text"		"Number of rounds"
-			"help"		"Set the number of rounds before mapvote"
-			"type"		"Numeric"
-			"default"	"10"
+			"name"     "ph_roundlimit"
+			"text"     "Number of rounds"
+			"help"     "Number of rounds before map vote."
+			"type"     "Numeric"
+			"default"  "10"
 		}
 		4
 		{
-			"name"		"ph_roundtime"
-			"text"		"Rounds time limit"
-			"help"		"Time limit before ending the round (0 for automatic time)"
-			"type"		"Numeric"
-			"default"	"0"
+			"name"     "ph_roundtime"
+			"text"     "Round time limit"
+			"help"     "Time limit before ending the round (0 for automatic time)."
+			"type"     "Numeric"
+			"default"  "0"
 		}
 		5
 		{
-			"name"		"ph_hidingtime"
-			"text"		"Hiding phase time"
-			"help"		"Time before hunters are released"
-			"type"		"Numeric"
-			"default"	"30"
+			"name"     "ph_hidingtime"
+			"text"     "Hiding phase time"
+			"help"     "Time before hunters are released."
+			"type"     "Numeric"
+			"default"  "30"
 		}
 		6
 		{
-			"name"		"ph_postroundtime"
-			"text"		"Post-round time"
-			"help"		"Time before next round after end of the round"
-			"type"		"Numeric"
-			"default"	"15"
-
+			"name"     "ph_postroundtime"
+			"text"     "Post-round time"
+			"help"     "Time before the next round after a round ends."
+			"type"     "Numeric"
+			"default"  "15"
 		}
 		7
 		{
-			"name"		"ph_hunter_dmgpenalty"
-			"text"		"Damage taken by hunters"
-			"help"		"Amount of damage a hunter should take for shooting an incorrect prop"
-			"type"		"Numeric"
-			"default"	"3"
+			"name"     "ph_hunter_dmgpenalty"
+			"text"     "Damage taken by hunters"
+			"help"     "Damage a hunter takes for shooting an incorrect prop."
+			"type"     "Numeric"
+			"default"  "3"
 		}
 		8
 		{
-			"name"		"ph_hunter_smggrenades"
-			"text"		"Number of SMG grenades"
-			"help"		"Amount of SMG grenades hunters should spawn with"
-			"type"		"Numeric"
-			"default"	"1"
+			"name"     "ph_hunter_smggrenades"
+			"text"     "Number of SMG grenades"
+			"help"     "Amount of SMG grenades hunters spawn with."
+			"type"     "Numeric"
+			"default"  "1"
 		}
 		9
 		{
-			"name"		"ph_dead_canroam"
-			"text"		"Use roam spectate mode"
-			"help"		"Can dead players use the roam spectate mode"
-			"type"		"CheckBox"
-			"default"	"0"
+			"name"     "ph_dead_canroam"
+			"text"     "Use roam spectate mode"
+			"help"     "Allow dead players to use roam spectate."
+			"type"     "CheckBox"
+			"default"  "0"
 		}
 		10
 		{
-			"name"		"ph_props_onwinstayprops"
-			"text"		"Props stay props on win"
-			"help"		"If the props win, they stay on the props team"
-			"type"		"CheckBox"
-			"default"	"0"
+			"name"     "ph_props_onwinstayprops"
+			"text"     "Props stay props on win"
+			"help"     "If props win, they remain on the props team."
+			"type"     "CheckBox"
+			"default"  "0"
 		}
 		11
 		{
-			"name"		"ph_auto_taunt"
-			"text"		"Auto taunts enabled"
-			"help"		"Sets if auto taunts are enabled."
-			"type"		"CheckBox"
-			"default"	"0"
+			"name"     "ph_auto_taunt"
+			"text"     "Auto taunts enabled"
+			"help"     "Enable automatic taunts."
+			"type"     "CheckBox"
+			"default"  "0"
 		}
 		12
 		{
-			"name"		"ph_auto_taunt_delay_min"
-			"text"		"Min time without taunting"
-			"help"		"Mininum time to go without taunting (sec)."
-			"type"		"Numeric"
-			"default"	"60"
+			"name"     "ph_auto_taunt_delay_min"
+			"text"     "Minimum time without taunting"
+			"help"     "Minimum time without a taunt (seconds)."
+			"type"     "Numeric"
+			"default"  "60"
 		}
 		13
 		{
-			"name"		"ph_auto_taunt_delay_max"
-			"text"		"Max time without taunting"
-			"help"		"Maximum time to go without taunting (sec)."
-			"type"		"Numeric"
-			"default"	"120"
+			"name"     "ph_auto_taunt_delay_max"
+			"text"     "Maximum time without taunting"
+			"help"     "Maximum time without a taunt (seconds)."
+			"type"     "Numeric"
+			"default"  "120"
 		}
 		14
 		{
-			"name"		"ph_hunter_deaf_onhiding"
-			"text"		"Deaf hunter on hinding"
-			"help"		"Deaf hunters while hiding duration (black screen)"
-			"type"		"CheckBox"
-			"default"	"1"
+			"name"     "ph_hunter_deaf_onhiding"
+			"text"     "Blind/Deafen hunters during hiding"
+			"help"     "Apply black screen and muted audio to hunters during the hiding phase."
+			"type"     "CheckBox"
+			"default"  "1"
 		}
 		15
 		{
-			"name"		"ph_props_silent_footsteps"
-			"text"		"Props silent footsteps"
-			"help"		"Does props emit footsteps sounds while moving"
-			"type"		"CheckBox"
-			"default"	"0"
+			"name"     "ph_props_silent_footsteps"
+			"text"     "Props silent footsteps"
+			"help"     "Do props emit footstep sounds while moving?"
+			"type"     "CheckBox"
+			"default"  "0"
 		}
 		16
 		{
-			"name"		"ph_props_tpose"
-			"text"		"Props Tpose"
-			"help"		"Should props be in T pose"
-			"type"		"CheckBox"
-			"default"	"0"
+			"name"     "ph_props_tpose"
+			"text"     "Props T-pose"
+			"help"     "Should props be in T-pose?"
+			"type"     "CheckBox"
+			"default"  "0"
 		}
 		17
 		{
-			"name"		"ph_props_undisguised_thirdperson"
-			"text"		"Props Undisguised Thirdperson"
-			"help"		"Should props be in thirdperson when undisguised"
-			"type"		"CheckBox"
-			"default"	"0"
+			"name"     "ph_props_undisguised_thirdperson"
+			"text"     "Third-person when undisguised"
+			"help"     "Use third-person camera when props are undisguised."
+			"type"     "CheckBox"
+			"default"  "0"
 		}
 		18
 		{
-			"name"		"ph_props_random_change"
-			"text"		"Random props"
-			"help"		"Should props be randons when selected"
-			"type"		"CheckBox"
-			"default"	"0"
+			"name"     "ph_props_random_change"
+			"text"     "Randomize props on selection"
+			"help"     "Randomly choose a prop when selected."
+			"type"     "CheckBox"
+			"default"  "0"
 		}
 		19
 		{
-			"name"		"ph_random_prop_limit"
-			"text"		"Number of random props allowed per round"
-			"help"		"Number of random props allowed per round"
-			"type"		"Numeric"
-			"default"	"3"
+			"name"     "ph_random_prop_limit"
+			"text"     "Random props per round"
+			"help"     "Maximum number of random prop selections per round."
+			"type"     "Numeric"
+			"default"  "3"
 		}
 		20
 		{
-			"name"		"ph_audio_spatialization"
-			"text"		"Enhanced 3D Audio Spatialization"
-			"help"		"Enable enhanced 3D audio spatialization for better height perception"
-			"type"		"CheckBox"
-			"default"	"1"
+			"name"     "ph_audio_spatialization"
+			"text"     "Enhanced 3D audio spatialization"
+			"help"     "Enable enhanced 3D audio spatialization for better height perception."
+			"type"     "CheckBox"
+			"default"  "1"
 		}
 		21
 		{
-			"name"		"ph_audio_debug"
-			"text"		"Audio Debug Information"
-			"help"		"Show audio spatialization debug information on screen"
-			"type"		"CheckBox"
-			"default"	"0"
+			"name"     "ph_audio_debug"
+			"text"     "Audio debug information"
+			"help"     "Show audio spatialization debug info on-screen."
+			"type"     "CheckBox"
+			"default"  "0"
 		}
 	}
 }
