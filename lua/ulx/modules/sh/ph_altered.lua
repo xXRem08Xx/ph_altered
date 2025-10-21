@@ -180,3 +180,13 @@ end)
 commandToUlx("ph_endround", function(c)
     c:help("Ends the round on a tie.")
 end)
+
+commandToUlx("ph_audio_debug", function(c)
+    c:addParam{ type = ULib.cmds.BoolArg, hint = "enabled", ULib.cmds.optional }
+    c:help("Enable/disable audio spatialization debug information.")
+end)
+
+commandToUlx("ph_audio_spatialization", function(c)
+    c:addParam{ type = ULib.cmds.BoolArg, hint = "enabled", ULib.cmds.optional }
+    c:help("Enable/disable enhanced 3D audio spatialization.")
+end)

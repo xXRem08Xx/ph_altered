@@ -161,5 +161,21 @@
 			"type"		"Numeric"
 			"default"	"3"
 		}
+		20
+		{
+			"name"		"ph_audio_spatialization"
+			"text"		"Enhanced 3D Audio Spatialization"
+			"help"		"Enable enhanced 3D audio spatialization for better height perception"
+			"type"		"CheckBox"
+			"default"	"1"
+		}
+		21
+		{
+			"name"		"ph_audio_debug"
+			"text"		"Audio Debug Information"
+			"help"		"Show audio spatialization debug information on screen"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
 	}
 }

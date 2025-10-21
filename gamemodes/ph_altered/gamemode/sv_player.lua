@@ -539,7 +539,13 @@ end
 
 function GM:DoPlayerDeath(ply, attacker, dmginfo)
 	if ply:IsDisguised() && ply:IsProp() then
-		ply:EmitSound(randomDeathsound(ply))
+		-- Utiliser le système de spatialisation audio 3D pour les sons de mort
+		if AudioSpatialization then
+			AudioSpatialization:EmitDeathSound3D(ply, randomDeathsound(ply), 1.0, 100)
+		else
+			-- Fallback vers l'ancien système
+			ply:EmitSound(randomDeathsound(ply))
+		end
 	end
 
 	if ply.TauntsUsed then
