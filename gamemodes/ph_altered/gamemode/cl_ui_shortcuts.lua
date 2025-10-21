@@ -3,6 +3,9 @@
 
 local UIShortcuts = {}
 
+-- ConVar d'affichage des raccourcis (évite les nil sur GetConVar)
+local cvarShowShortcuts = CreateClientConVar("ph_show_shortcuts", "0", true, false, "Afficher les raccourcis clavier dans le HUD")
+
 -- Configuration des raccourcis
 UIShortcuts.Shortcuts = {
     {
@@ -150,7 +153,7 @@ end)
 
 -- Fonction pour afficher les raccourcis dans le HUD
 local function DrawShortcutsHelp()
-    if not GetConVar("ph_show_shortcuts"):GetBool() then return end
+    if not cvarShowShortcuts:GetBool() then return end
     
     local x = 10
     local y = ScrH() - 200
@@ -182,7 +185,7 @@ end)
 
 -- Commande pour basculer l'affichage des raccourcis
 concommand.Add("ph_toggle_shortcuts", function()
-    local current = GetConVar("ph_show_shortcuts"):GetBool()
+    local current = cvarShowShortcuts:GetBool()
     RunConsoleCommand("ph_show_shortcuts", current and "0" or "1")
     
     if UINotifications then
