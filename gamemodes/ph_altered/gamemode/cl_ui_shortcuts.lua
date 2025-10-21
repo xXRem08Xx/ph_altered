@@ -138,15 +138,28 @@ end
 -- Hook pour gérer les touches
 hook.Add("PlayerButtonDown", "UIShortcuts_HandleKey", function(ply, button)
     if not IsValid(ply) or ply != LocalPlayer() then return end
-    
-    -- Vérifier si une interface est ouverte
-    local hasOpenInterface = false
+
+    -- Empêche les interférences entre interfaces tout en autorisant la touche liée pour fermer la fenêtre ouverte.
+    local shouldBlock = false
+    local matchingOpen = false
+
     if ModernSettings and IsValid(ModernSettings.settingsMenu) and ModernSettings.settingsMenu:IsVisible() then
-        hasOpenInterface = true
+        if button == KEY_F1 or button == KEY_F2 then
+            matchingOpen = true
+        else
+            shouldBlock = true
+        end
     end
-    
-    -- Exécuter le raccourci si pas d'interface ouverte
-    if not hasOpenInterface then
+
+    if _G.menu and IsValid(_G.menu) and _G.menu:IsVisible() then
+        if button == KEY_F3 then
+            matchingOpen = true
+        else
+            shouldBlock = true
+        end
+    end
+
+    if matchingOpen or not shouldBlock then
         UIShortcuts:Execute(button)
     end
 end)
@@ -176,7 +189,11 @@ local function DrawShortcutsHelp()
 end
 
 -- Hook pour dessiner l'aide des raccourcis
-hook.Add("HUDPaint", "UIShortcuts_DrawHelp", DrawShortcutsHelp)
+hook.Add("HUDPaint", "UIShortcuts_DrawHelp", function()
+    if cvarShowShortcuts and cvarShowShortcuts:GetBool() then
+        DrawShortcutsHelp()
+    end
+end)
 
 -- Commande pour afficher l'aide des raccourcis
 concommand.Add("ph_shortcuts_help", function()

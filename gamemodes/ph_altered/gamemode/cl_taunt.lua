@@ -4,6 +4,9 @@ local menu
 local lastCursorX
 local lastCursorY
 
+-- Rendre la variable menu accessible globalement pour les raccourcis
+_G.menu = menu
+
 local function colMul(color, mul)
 	color.r = math.Clamp(math.Round(color.r * mul), 0, 255)
 	color.g = math.Clamp(math.Round(color.g * mul), 0, 255)
@@ -120,13 +123,20 @@ end
 local function openTauntMenu()
 	restoreCursor()
 	if IsValid(menu) then
-		fillCats(menu.CatList, menu.TauntList)
-		fillList(menu.TauntList, menu.CurrentTaunts, menu.CurrentTauntCat)
 		if menu:IsVisible() then
 			saveCursor()
+			menu:Close()
+			return
 		end
 
-		menu:SetVisible(!menu:IsVisible())
+		fillCats(menu.CatList, menu.TauntList)
+		fillList(menu.TauntList, menu.CurrentTaunts || Taunts, menu.CurrentTauntCat)
+
+		menu:SetVisible(true)
+		menu:MakePopup()
+		menu:SetKeyboardInputEnabled(false)
+		-- Mettre à jour la référence globale
+		_G.menu = menu
 		return
 	end
 
@@ -140,6 +150,14 @@ local function openTauntMenu()
 	menu:SetDraggable(false)
 	menu:ShowCloseButton(true)
 	menu:DockPadding(8, 8 + draw.GetFontHeight("RobotoHUD-25"), 8, 8)
+	
+	-- Mettre à jour la référence globale
+	_G.menu = menu
+	
+	-- Hook pour nettoyer la référence globale quand le menu est fermé
+	function menu:OnClose()
+		_G.menu = nil
+	end
 
 	function menu:Paint(w, h)
 		surface.SetDrawColor(40, 40, 40, 230)
