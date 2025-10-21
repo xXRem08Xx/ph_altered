@@ -130,7 +130,7 @@ local function openTauntMenu()
 		end
 
 		fillCats(menu.CatList, menu.TauntList)
-		fillList(menu.TauntList, menu.CurrentTaunts || Taunts, menu.CurrentTauntCat)
+		fillList(menu.TauntList, menu.CurrentTaunts or Taunts, menu.CurrentTauntCat)
 
 		menu:SetVisible(true)
 		menu:MakePopup()

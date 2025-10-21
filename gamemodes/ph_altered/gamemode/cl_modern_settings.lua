@@ -164,7 +164,7 @@ local function createSettingControl(parent, def)
     if helpText ~= "" then
       local hlp = vgui.Create("DLabel", parent)
       hlp:SetFont("PH_Help")
-      hlp:SetText(helpText .. (exists ? "" : "  (ConVar introuvable)"))
+      hlp:SetText(helpText .. (exists and "" or "  (ConVar introuvable)"))
       hlp:SetTextColor(exists and Color(200,200,200) or Color(255,120,120))
       hlp:Dock(TOP)
       hlp:DockMargin(4, 0, 0, 8)
