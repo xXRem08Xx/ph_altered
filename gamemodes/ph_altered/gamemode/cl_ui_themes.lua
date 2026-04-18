@@ -113,9 +113,9 @@ function UIThemes:DrawModernButton(panel, w, h, text, isHovered, isPressed)
     surface.DrawOutlinedRect(0, 0, w, h, 1)
     
     -- Texte
-    surface.SetFont("DermaDefault")
+    surface.SetFont("ModernSettings_Label")
     local textW, textH = surface.GetTextSize(text)
-    draw.SimpleText(text, "DermaDefault", w/2, h/2, theme.colors.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+    draw.SimpleText(text, "ModernSettings_Label", w/2, h/2, theme.colors.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 end
 
 -- Fonction pour dessiner un panneau moderne
@@ -189,8 +189,8 @@ function UIThemes:DrawModernTextEntry(panel, w, h, text, isFocused)
     
     -- Texte
     if text and text != "" then
-        surface.SetFont("DermaDefault")
-        draw.SimpleText(text, "DermaDefault", 5, h/2, theme.colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+        surface.SetFont("ModernSettings_Label")
+        draw.SimpleText(text, "ModernSettings_Label", 5, h/2, theme.colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
     end
 end
 
@@ -212,8 +212,8 @@ function UIThemes:DrawModernTab(panel, w, h, text, isActive, isHovered)
     surface.DrawOutlinedRect(0, 0, w, h, 1)
     
     -- Texte
-    surface.SetFont("DermaDefault")
-    draw.SimpleText(text, "DermaDefault", w/2, h/2, theme.colors.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+    surface.SetFont("ModernSettings_Label")
+    draw.SimpleText(text, "ModernSettings_Label", w/2, h/2, theme.colors.text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 end
 
 -- Fonction pour dessiner un titre moderne
@@ -237,13 +237,13 @@ function UIThemes:DrawModernTitle(panel, w, h, text, subtitle)
     surface.DrawOutlinedRect(0, 0, w, h, 2)
     
     -- Titre principal
-    surface.SetFont("DermaLarge")
-    draw.SimpleText(text, "DermaLarge", 20, 15, theme.colors.text, TEXT_ALIGN_LEFT)
+    surface.SetFont("ModernSettings_Title")
+    draw.SimpleText(text, "ModernSettings_Title", 20, 15, theme.colors.text, TEXT_ALIGN_LEFT)
     
     -- Sous-titre
     if subtitle then
-        surface.SetFont("DermaDefault")
-        draw.SimpleText(subtitle, "DermaDefault", 20, 45, theme.colors.textSecondary, TEXT_ALIGN_LEFT)
+        surface.SetFont("ModernSettings_Subtitle")
+        draw.SimpleText(subtitle, "ModernSettings_Subtitle", 20, 45, theme.colors.textSecondary, TEXT_ALIGN_LEFT)
     end
 end
 
@@ -260,8 +260,8 @@ function UIThemes:DrawModernTooltip(panel, w, h, text)
     surface.DrawOutlinedRect(0, 0, w, h, 1)
     
     -- Texte
-    surface.SetFont("DermaDefault")
-    draw.SimpleText(text, "DermaDefault", 10, h/2, theme.colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+    surface.SetFont("ModernSettings_Help")
+    draw.SimpleText(text, "ModernSettings_Help", 10, h/2, theme.colors.text, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 end
 
 -- Exporter le module

@@ -109,16 +109,16 @@ function Notification:Paint()
     
     -- Icône
     local icon = UINotifications.Icons[self.type] or UINotifications.Icons.info
-    surface.SetFont("DermaLarge")
-    draw.SimpleText(icon, "DermaLarge", self.x + 15, self.y + 15, Color(255, 255, 255, 255 * self.alpha), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+    surface.SetFont("ModernSettings_Title")
+    draw.SimpleText(icon, "ModernSettings_Title", self.x + 15, self.y + 15, Color(255, 255, 255, 255 * self.alpha), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
     
     -- Titre
-    surface.SetFont("DermaDefault")
-    draw.SimpleText(self.title, "DermaDefault", self.x + 50, self.y + 15, Color(255, 255, 255, 255 * self.alpha), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+    surface.SetFont("ModernSettings_Label")
+    draw.SimpleText(self.title, "ModernSettings_Label", self.x + 50, self.y + 15, Color(255, 255, 255, 255 * self.alpha), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
     
     -- Message
-    surface.SetFont("DermaDefault")
-    draw.SimpleText(self.message, "DermaDefault", self.x + 15, self.y + 40, Color(200, 200, 200, 200 * self.alpha), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+    surface.SetFont("ModernSettings_Help")
+    draw.SimpleText(self.message, "ModernSettings_Help", self.x + 15, self.y + 40, Color(200, 200, 200, 200 * self.alpha), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
     
     -- Barre de progression
     local progress = math.max(0, (self.endTime - CurTime()) / self.duration)
@@ -194,7 +194,9 @@ hook.Add("Think", "UINotifications_Update", function()
 end)
 
 hook.Add("HUDPaint", "UINotifications_Paint", function()
-    UINotifications:Paint()
+    if UINotifications and UINotifications.Paint then
+        UINotifications:Paint()
+    end
 end)
 
 -- Fonction pour notifier les changements de paramètres
