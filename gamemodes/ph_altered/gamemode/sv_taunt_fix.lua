@@ -42,38 +42,28 @@ function TauntFix:EmitTauntSafe(ply, filename, durationOverride)
         return false
     end
     
+    -- SoundDuration renvoie 0 pour les MP3 (bug connu Source) : on fait confiance
+    -- à durationOverride pour les mp3, sinon à SoundDuration.
     local duration = SoundDuration(filename)
-    if filename:match("%.mp3$") then
-        duration = durationOverride or 1
+    if filename:match("%.mp3$") or duration <= 0 then
+        duration = durationOverride or duration
+        if not duration or duration <= 0 then duration = 3 end
     end
-    
+
     local sndName = FilenameToSoundname(filename)
-    local success = false
-    
-    -- Essayer d'émettre le son avec le système de spatialisation
+
+    -- Emission unique via le helper (un seul EmitSound broadcast natif).
+    -- Le hook EntityEmitSound client applique occlusion / élévation / DSP.
+    local ok, err
     if AudioSpatialization then
-        local success, err = pcall(function()
-            AudioSpatialization:EmitTaunt3D(ply, sndName, 1.0, 100)
-        end)
-        
-        if success then
-            success = true
-        else
-            print("[TauntFix] Erreur spatialisation: " .. tostring(err))
-        end
+        ok, err = pcall(AudioSpatialization.EmitTaunt3D, AudioSpatialization, ply, sndName, 1.0, 100)
+    else
+        ok, err = pcall(function() ply:EmitSound(sndName) end)
     end
-    
-    -- Fallback vers l'ancien système si la spatialisation échoue
-    if not success then
-        local success, err = pcall(function()
-            ply:EmitSound(sndName)
-        end)
-        
-        if success then
-            success = true
-        else
-            print("[TauntFix] Erreur son basique: " .. tostring(err))
-        end
+
+    local success = ok
+    if not ok then
+        print("[TauntFix] Erreur emission taunt: " .. tostring(err))
     end
     
     -- Si le son a réussi, définir le timer
@@ -117,7 +107,7 @@ end
 
 -- Fonction pour vérifier et corriger les taunts bloqués
 function TauntFix:CheckBlockedTaunts()
-    for _, ply in pairs(player.GetAll()) do
+    for _, ply in ipairs(player.GetHumans()) do
         if IsValid(ply) and ply.TauntEnd then
             local timeLeft = ply.TauntEnd - CurTime()
             
@@ -269,6 +259,12 @@ concommand.Add("ph_taunt_stats", function(ply, cmd, args)
     ply:ChatPrint("- Temps restant: " .. math.Round(stats.timeLeft) .. "s")
     ply:ChatPrint("- Récents: " .. stats.recentTaunts)
     ply:ChatPrint("- Ping: " .. stats.ping .. "ms")
+end)
+
+hook.Add("PlayerDisconnected", "PH_TauntFixCleanup", function(ply)
+    if IsValid(ply) then
+        timer.Remove("taunt_safety_" .. ply:SteamID())
+    end
 end)
 
 -- Exporter le module

@@ -1,353 +1,470 @@
--- Interface moderne des paramètres Prop Hunt avec onglets par catégorie
--- Remplace l'ancien système d'options basique
+-- Menu Paramètres Prop Hunt — refonte sidebar + content.
+-- Live-apply : chaque contrôle met à jour sa ConVar directement, pas de bouton
+-- Apply. Reset d'onglet uniquement (pas de reset global destructif).
 
 local ModernSettings = {}
-local settingsMenu = nil
+local settingsMenu
 
--- Configuration des catégories et paramètres
+-- ============================================================================
+-- Couleurs / polices
+-- ============================================================================
+
+local COL_BG        = Color(22, 22, 27, 250)
+local COL_SIDEBAR   = Color(16, 16, 20, 255)
+local COL_CARD      = Color(34, 34, 40, 255)
+local COL_CARD_HOV  = Color(42, 42, 50, 255)
+local COL_TEXT      = Color(235, 235, 240)
+local COL_SUB       = Color(160, 160, 170)
+local COL_DIM       = Color(100, 100, 110)
+local COL_MODIFIED  = Color(240, 170, 60)
+
+surface.CreateFont("PHSettingsTitle",   {font = "Roboto", size = 24, weight = 700, antialias = true})
+surface.CreateFont("PHSettingsTab",     {font = "Roboto", size = 15, weight = 600, antialias = true})
+surface.CreateFont("PHSettingsLabel",   {font = "Roboto", size = 15, weight = 600, antialias = true})
+surface.CreateFont("PHSettingsDesc",    {font = "Roboto", size = 12, weight = 400, antialias = true})
+surface.CreateFont("PHSettingsValue",   {font = "Roboto", size = 14, weight = 600, antialias = true})
+surface.CreateFont("PHSettingsSmall",   {font = "Roboto", size = 11, weight = 400, antialias = true})
+
+-- ============================================================================
+-- Catégories & paramètres
+-- ============================================================================
+
+local function classSettings()
+    local list = {
+        {name = "ph_classes_enabled",    type = "bool", label = "Système de classes activé", help = "Active le système global de classes"},
+        {name = "ph_classes_auto_assign",type = "bool", label = "Assignation auto si pas de pick", help = "Attribue une classe aléatoire aux joueurs qui n'ont pas choisi"},
+        {name = "ph_classes_hud",        type = "bool", label = "Afficher la card HUD", help = "Affiche la card de classe en jeu"},
+    }
+    local classIds = {"medic", "ghost", "decoy", "jumper", "scout", "tracker", "demolition", "sweeper"}
+    for _, id in ipairs(classIds) do
+        list[#list + 1] = {name = "ph_class_" .. id, type = "bool",
+            label = "Activer " .. id:sub(1,1):upper() .. id:sub(2),
+            help = "Rend la classe disponible dans le menu de sélection"}
+    end
+    -- Balance
+    local balance = {
+        {name = "ph_class_medic_heal",         type = "int",   label = "Medic : heal (HP)",          min = 10, max = 100},
+        {name = "ph_class_ghost_duration",     type = "float", label = "Ghost : durée (s)",           min = 1,  max = 6,    decimals = 1},
+        {name = "ph_class_decoy_duration",     type = "int",   label = "Decoy : durée clone (s)",     min = 5,  max = 30},
+        {name = "ph_class_jumper_min_range",   type = "int",   label = "Jumper : portée min",         min = 200,max = 800},
+        {name = "ph_class_jumper_max_range",   type = "int",   label = "Jumper : portée max",         min = 500,max = 1500},
+        {name = "ph_class_scout_cone_deg",     type = "int",   label = "Scout : angle cône (°)",      min = 30, max = 120},
+        {name = "ph_class_scout_range",        type = "int",   label = "Scout : portée",              min = 500,max = 3000},
+        {name = "ph_class_tracker_warn_delay", type = "float", label = "Tracker : délai warning (s)", min = 0.2,max = 3,    decimals = 1},
+        {name = "ph_class_demolition_radius",  type = "int",   label = "Demolition : rayon",          min = 200,max = 800},
+        {name = "ph_class_sweeper_radius",     type = "int",   label = "Sweeper : rayon",             min = 300,max = 1200},
+        {name = "ph_class_sweeper_percent",    type = "int",   label = "Sweeper : % supprimés",       min = 10, max = 80},
+        {name = "ph_class_sweeper_cap",        type = "int",   label = "Sweeper : cap max",           min = 5,  max = 60},
+    }
+    for _, s in ipairs(balance) do list[#list + 1] = s end
+    return list
+end
+
 ModernSettings.Categories = {
     {
-        name = "Général",
-        icon = "🎮",
-        color = Color(52, 152, 219),
+        name = "Général", color = Color(52, 152, 219),
         settings = {
-            {name = "ph_roundlimit", type = "int", label = "Nombre de rounds", min = 1, max = 50, decimals = 0, help = "Nombre de rounds avant le vote de carte"},
-            {name = "ph_roundtime", type = "int", label = "Durée des rounds (sec)", min = 0, max = 300, decimals = 0, help = "Durée limite des rounds (0 = automatique)"},
-            {name = "ph_mapstartwait", type = "int", label = "Attente avant début (sec)", min = 0, max = 120, decimals = 0, help = "Temps d'attente avant le début de la carte"},
-            {name = "ph_hidingtime", type = "int", label = "Temps de cachette (sec)", min = 0, max = 120, decimals = 0, help = "Temps avant que les chasseurs soient libérés"},
-            {name = "ph_postroundtime", type = "int", label = "Temps post-round (sec)", min = 2, max = 60, decimals = 0, help = "Temps avant le round suivant"},
-            {name = "ph_map_time_limit", type = "int", label = "Limite de temps de carte (min)", min = -1, max = 120, decimals = 0, help = "Minutes avant le dernier round (-1 = désactivé)"}
-        }
+            {name = "ph_roundlimit",     type = "int", label = "Nombre de rounds",         min = 1, max = 50, help = "Rounds avant vote de carte"},
+            {name = "ph_roundtime",      type = "int", label = "Durée des rounds (s)",      min = 0, max = 300, help = "0 = automatique"},
+            {name = "ph_mapstartwait",   type = "int", label = "Attente avant début (s)",   min = 0, max = 120},
+            {name = "ph_hidingtime",     type = "int", label = "Temps de cachette (s)",     min = 0, max = 120},
+            {name = "ph_postroundtime",  type = "int", label = "Temps post-round (s)",      min = 2, max = 60},
+            {name = "ph_map_time_limit", type = "int", label = "Limite temps carte (min)",  min = -1, max = 120, help = "-1 = désactivé"},
+        },
     },
     {
-        name = "Équipes",
-        icon = "👥",
-        color = Color(46, 204, 113),
+        name = "Équipes", color = Color(46, 204, 113),
         settings = {
-            {name = "ph_auto_team_balance", type = "bool", label = "Équilibrage automatique des équipes", help = "Équilibre automatiquement les équipes"},
-            {name = "ph_nb_hunter", type = "int", label = "Nombre de chasseurs", min = 1, max = 10, decimals = 0, help = "Nombre de chasseurs (si équilibrage désactivé)"},
-            {name = "ph_props_onwinstayprops", type = "bool", label = "Props restent props en cas de victoire", help = "Les props restent dans leur équipe après une victoire"},
-            {name = "ph_dead_canroam", type = "bool", label = "Spectateurs libres", help = "Les joueurs morts peuvent utiliser le mode spectateur libre"}
-        }
+            {name = "ph_auto_team_balance",     type = "bool", label = "Équilibrage automatique"},
+            {name = "ph_nb_hunter",             type = "int",  label = "Nombre de chasseurs", min = 1, max = 10, help = "Utilisé si équilibrage désactivé"},
+            {name = "ph_props_onwinstayprops",  type = "bool", label = "Props restent props en cas de victoire"},
+            {name = "ph_dead_canroam",          type = "bool", label = "Spectateur libre pour les morts"},
+        },
     },
     {
-        name = "Chasseurs",
-        icon = "🎯",
-        color = Color(231, 76, 60),
+        name = "Chasseurs", color = Color(231, 76, 60),
         settings = {
-            {name = "ph_hunter_dmgpenalty", type = "int", label = "Dégâts pour mauvais tir", min = 0, max = 100, decimals = 0, help = "Dégâts subis pour tirer sur un mauvais prop"},
-            {name = "ph_hunter_smggrenades", type = "int", label = "Grenades SMG", min = 0, max = 5, decimals = 0, help = "Nombre de grenades SMG pour les chasseurs"},
-            {name = "ph_hunter_deaf_onhiding", type = "bool", label = "Sourds pendant la cachette", help = "Les chasseurs sont sourds pendant la phase de cachette"},
-            {name = "ph_hunter_aim_laser", type = "int", label = "Laser de visée", min = 0, max = 2, decimals = 0, help = "Qui peut voir le laser de visée (0=nul, 1=spectateurs, 2=props+spectateurs)"}
-        }
+            {name = "ph_hunter_dmgpenalty",    type = "int",  label = "Dégâts mauvais tir", min = 0, max = 100},
+            {name = "ph_hunter_smggrenades",   type = "int",  label = "Grenades SMG",       min = 0, max = 5},
+            {name = "ph_hunter_deaf_onhiding", type = "bool", label = "Sourds pendant la cachette"},
+            {name = "ph_hunter_aim_laser",     type = "int",  label = "Laser visibilité",   min = 0, max = 2, help = "0=nul, 1=spec, 2=props+spec"},
+        },
     },
     {
-        name = "Props",
-        icon = "📦",
-        color = Color(155, 89, 182),
+        name = "Props", color = Color(155, 89, 182),
         settings = {
-            {name = "ph_props_small_size", type = "int", label = "Pénalité petite taille", min = 0, max = 1000, decimals = 0, help = "Pénalité de vitesse pour les petits props"},
-            {name = "ph_props_jumppower", type = "float", label = "Puissance de saut", min = 0, max = 5, decimals = 2, help = "Bonus de puissance de saut pour les props"},
-            {name = "ph_props_camdistance", type = "float", label = "Distance caméra", min = 0, max = 5, decimals = 2, help = "Multiplicateur de distance de caméra pour les props déguisés"},
-            {name = "ph_props_silent_footsteps", type = "bool", label = "Pas silencieux", help = "Les props n'émettent pas de sons de pas"},
-            {name = "ph_props_tpose", type = "bool", label = "T-pose", help = "Les props sont en T-pose"},
-            {name = "ph_props_undisguised_thirdperson", type = "bool", label = "Vue 3ème personne non déguisé", help = "Les props non déguisés sont en vue 3ème personne"},
-            {name = "ph_props_random_change", type = "bool", label = "Props aléatoires", help = "Les props changent aléatoirement"},
-            {name = "ph_random_prop_limit", type = "int", label = "Limite props aléatoires", min = 0, max = 10, decimals = 0, help = "Nombre de changements de props aléatoires par round"}
-        }
+            {name = "ph_props_small_size",               type = "int",   label = "Pénalité petite taille", min = 0, max = 1000},
+            {name = "ph_props_jumppower",                type = "float", label = "Puissance de saut",      min = 0, max = 5, decimals = 2},
+            {name = "ph_props_camdistance",              type = "float", label = "Distance caméra",         min = 0, max = 5, decimals = 2},
+            {name = "ph_props_silent_footsteps",         type = "bool",  label = "Pas silencieux"},
+            {name = "ph_props_tpose",                    type = "bool",  label = "T-pose"},
+            {name = "ph_props_undisguised_thirdperson",  type = "bool",  label = "3ème personne non déguisé"},
+            {name = "ph_random_prop_mode",               type = "bool",  label = "Mode random prop"},
+            {name = "ph_random_prop_limit",              type = "int",   label = "Limite random props",    min = 0, max = 10},
+        },
     },
     {
-        name = "Audio & Voix",
-        icon = "🔊",
-        color = Color(241, 196, 15),
+        name = "Audio & Voix", color = Color(241, 196, 15),
         settings = {
-            {name = "ph_voice_hearotherteam", type = "bool", label = "Entendre l'autre équipe", help = "Permet d'entendre le chat vocal de l'autre équipe"},
-            {name = "ph_voice_heardead", type = "bool", label = "Entendre les morts", help = "Permet d'entendre le chat vocal des joueurs morts"},
-            {name = "ph_audio_spatialization", type = "bool", label = "Spatialisation audio 3D", help = "Améliore la perception de la hauteur des sons"},
-            {name = "ph_audio_debug", type = "bool", label = "Debug audio", help = "Affiche les informations de debug audio"}
-        }
+            {name = "ph_voice_hearotherteam",  type = "bool", label = "Entendre l'autre équipe"},
+            {name = "ph_voice_heardead",       type = "bool", label = "Entendre les morts"},
+            {name = "ph_audio_spatial_enabled",type = "bool", label = "Spatialisation audio 3D", help = "Applique occlusion et indices de verticalité"},
+            {name = "ph_audio_debug",          type = "bool", label = "Debug audio"},
+        },
     },
     {
-        name = "Taunts",
-        icon = "🎵",
-        color = Color(230, 126, 34),
+        name = "Taunts", color = Color(230, 126, 34),
         settings = {
-            {name = "ph_taunt_menu_phrase", type = "string", label = "Phrase du menu taunt", help = "Phrase affichée en haut du menu de taunts"},
-            {name = "ph_auto_taunt", type = "bool", label = "Taunts automatiques", help = "Active les taunts automatiques"},
-            {name = "ph_auto_taunt_delay_min", type = "int", label = "Délai min taunts auto (sec)", min = 0, max = 300, decimals = 0, help = "Délai minimum entre les taunts automatiques"},
-            {name = "ph_auto_taunt_delay_max", type = "int", label = "Délai max taunts auto (sec)", min = 0, max = 300, decimals = 0, help = "Délai maximum entre les taunts automatiques"},
-            {name = "ph_auto_taunt_props_only", type = "bool", label = "Taunts auto props seulement", help = "Les taunts automatiques ne s'appliquent qu'aux props"}
-        }
+            {name = "ph_taunt_menu_phrase",    type = "string", label = "Phrase du menu taunt"},
+            {name = "ph_auto_taunt",           type = "bool",   label = "Taunts automatiques"},
+            {name = "ph_auto_taunt_delay_min", type = "int",    label = "Délai min auto (s)", min = 0, max = 300},
+            {name = "ph_auto_taunt_delay_max", type = "int",    label = "Délai max auto (s)", min = 0, max = 300},
+            {name = "ph_auto_taunt_props_only",type = "bool",   label = "Auto-taunt props seulement"},
+        },
     },
     {
-        name = "Avancé",
-        icon = "⚙️",
-        color = Color(149, 165, 166),
+        name = "Classes", color = Color(200, 100, 255),
+        settings = classSettings(),
+    },
+    {
+        name = "Avancé", color = Color(149, 165, 166),
         settings = {
-            {name = "ph_secrets", type = "bool", label = "Secrets activés", help = "Active les fonctionnalités secrètes"},
-            {name = "ph_auto_taunt_delay_min", type = "int", label = "Délai min taunts auto (sec)", min = 0, max = 300, decimals = 0, help = "Délai minimum entre les taunts automatiques"},
-            {name = "ph_auto_taunt_delay_max", type = "int", label = "Délai max taunts auto (sec)", min = 0, max = 300, decimals = 0, help = "Délai maximum entre les taunts automatiques"}
-        }
-    }
+            {name = "ph_secrets", type = "bool", label = "Secrets activés"},
+        },
+    },
 }
 
--- Fonction pour créer le menu moderne
-function ModernSettings:CreateMenu()
-    if IsValid(settingsMenu) then
-        settingsMenu:Remove()
+-- ============================================================================
+-- Helpers de dessin
+-- ============================================================================
+
+local function drawRoundedRect(x, y, w, h, r, col)
+    draw.RoundedBox(r, x, y, w, h, col)
+end
+
+local function isModified(setting)
+    local cv = GetConVar(setting.name)
+    if not cv then return false end
+    return cv:GetString() ~= cv:GetDefault()
+end
+
+-- ============================================================================
+-- Construction d'une card de paramètre
+-- ============================================================================
+
+local function buildCard(parent, setting, accent)
+    local card = vgui.Create("DPanel", parent)
+    card:Dock(TOP)
+    card:DockMargin(0, 0, 0, 8)
+    card:SetTall(62)
+
+    card.Paint = function(self, w, h)
+        surface.SetDrawColor(self:IsHovered() and COL_CARD_HOV or COL_CARD)
+        surface.DrawRect(0, 0, w, h)
+        surface.SetDrawColor(accent)
+        surface.DrawRect(0, 0, 3, h)
+
+        -- Dot orange si modifié
+        if isModified(setting) then
+            surface.SetDrawColor(COL_MODIFIED)
+            surface.DrawRect(14, h / 2 - 3, 6, 6)
+        end
+
+        local labelX = isModified(setting) and 28 or 18
+        draw.SimpleText(setting.label, "PHSettingsLabel", labelX, 10, COL_TEXT)
+        if setting.help then
+            draw.SimpleText(setting.help, "PHSettingsDesc", labelX, 34, COL_SUB)
+        end
     end
+
+    local cv = GetConVar(setting.name)
+    if not cv then
+        local warn = vgui.Create("DLabel", card)
+        warn:Dock(RIGHT)
+        warn:SetWide(240)
+        warn:SetText("(ConVar introuvable)")
+        warn:SetFont("PHSettingsSmall")
+        warn:SetTextColor(Color(220, 80, 80))
+        return card
+    end
+
+    if setting.type == "bool" then
+        local cb = vgui.Create("DCheckBox", card)
+        cb:SetSize(44, 22)
+        cb:SetPos(0, 0) -- repositionné dans PerformLayout
+        cb:SetConVar(setting.name)
+        cb.Paint = function(self, w, h)
+            local on = self:GetChecked()
+            surface.SetDrawColor(on and accent or Color(70, 70, 80))
+            draw.RoundedBox(h / 2, 0, 0, w, h, on and accent or Color(60, 60, 70))
+            local knobX = on and (w - h + 2) or 2
+            draw.RoundedBox(h / 2 - 2, knobX, 2, h - 4, h - 4, Color(240, 240, 245))
+        end
+        card.PerformLayout = function(self, w, h)
+            cb:SetPos(w - cb:GetWide() - 16, (h - cb:GetTall()) / 2)
+        end
+
+    elseif setting.type == "int" or setting.type == "float" then
+        local slider = vgui.Create("DNumSlider", card)
+        slider:SetSize(280, 40)
+        slider:SetMin(setting.min or 0)
+        slider:SetMax(setting.max or 100)
+        slider:SetDecimals(setting.type == "float" and (setting.decimals or 2) or 0)
+        slider:SetConVar(setting.name)
+        slider:SetText("")
+        -- Cacher le label built-in
+        slider.Label:SetVisible(false)
+        -- Slider custom paint
+        if slider.Slider and slider.Slider.Paint then
+            slider.Slider.Paint = function(self, w, h)
+                surface.SetDrawColor(40, 40, 48)
+                draw.RoundedBox(3, 0, h / 2 - 3, w, 6, Color(40, 40, 48))
+                local frac = (slider:GetValue() - slider:GetMin()) / math.max(slider:GetMax() - slider:GetMin(), 0.0001)
+                draw.RoundedBox(3, 0, h / 2 - 3, w * frac, 6, accent)
+            end
+            if slider.Slider.Knob then
+                slider.Slider.Knob.Paint = function(self, w, h)
+                    draw.RoundedBox(h / 2, 0, 0, w, h, Color(240, 240, 245))
+                end
+            end
+        end
+        if slider.TextArea then
+            slider.TextArea:SetTextColor(COL_TEXT)
+            slider.TextArea:SetFont("PHSettingsValue")
+            slider.TextArea.Paint = function(self, w, h)
+                surface.SetDrawColor(12, 12, 16)
+                draw.RoundedBox(4, 0, 0, w, h, Color(12, 12, 16))
+                self:DrawTextEntryText(COL_TEXT, Color(100, 100, 120), COL_TEXT)
+            end
+        end
+        card.PerformLayout = function(self, w, h)
+            slider:SetPos(w - slider:GetWide() - 16, (h - slider:GetTall()) / 2)
+        end
+
+    elseif setting.type == "string" then
+        local entry = vgui.Create("DTextEntry", card)
+        entry:SetSize(260, 28)
+        entry:SetText(cv:GetString())
+        entry:SetFont("PHSettingsValue")
+        entry.OnEnter = function(self) RunConsoleCommand(setting.name, self:GetValue()) end
+        entry.OnFocusChanged = function(self, lost) if lost then RunConsoleCommand(setting.name, self:GetValue()) end end
+        entry.Paint = function(self, w, h)
+            surface.SetDrawColor(12, 12, 16)
+            draw.RoundedBox(4, 0, 0, w, h, Color(12, 12, 16))
+            surface.SetDrawColor(accent.r, accent.g, accent.b, 120)
+            surface.DrawOutlinedRect(0, 0, w, h, 1)
+            self:DrawTextEntryText(COL_TEXT, Color(100, 100, 120), COL_TEXT)
+        end
+        card.PerformLayout = function(self, w, h)
+            entry:SetPos(w - entry:GetWide() - 16, (h - entry:GetTall()) / 2)
+        end
+    end
+
+    card._setting = setting
+    return card
+end
+
+-- ============================================================================
+-- Fenêtre principale
+-- ============================================================================
+
+function ModernSettings:CreateMenu()
+    if IsValid(settingsMenu) then settingsMenu:Remove() end
 
     settingsMenu = vgui.Create("DFrame")
-    settingsMenu:SetSize(ScrW() * 0.7, ScrH() * 0.8)
+    settingsMenu:SetSize(math.min(ScrW() - 100, 980), math.min(ScrH() - 80, 720))
     settingsMenu:Center()
-    settingsMenu:MakePopup()
-    settingsMenu:SetKeyboardInputEnabled(false)
-    settingsMenu:SetDeleteOnClose(false)
-    settingsMenu:ShowCloseButton(true)
     settingsMenu:SetTitle("")
+    settingsMenu:ShowCloseButton(false)
+    settingsMenu:MakePopup()
     settingsMenu:SetDraggable(true)
 
-    -- Style moderne du menu
-    function settingsMenu:Paint(w, h)
-        -- Fond avec dégradé
-        local gradient = {}
-        for i = 0, h do
-            local alpha = 240 - (i / h) * 40
-            table.insert(gradient, {x = 0, y = i, w = w, h = 1, color = Color(30, 30, 35, alpha)})
-        end
-        
-        for _, rect in ipairs(gradient) do
-            surface.SetDrawColor(rect.color)
-            surface.DrawRect(rect.x, rect.y, rect.w, rect.h)
-        end
-
-        -- Bordure moderne
-        surface.SetDrawColor(52, 152, 219, 200)
-        surface.DrawOutlinedRect(0, 0, w, h, 2)
-
-        -- Titre avec icône
-        surface.SetFont("DermaLarge")
-        local titleW, titleH = surface.GetTextSize("⚙️ Paramètres Prop Hunt")
-        draw.SimpleText("⚙️ Paramètres Prop Hunt", "DermaLarge", 20, 15, Color(255, 255, 255), TEXT_ALIGN_LEFT)
-        
-        -- Sous-titre
-        surface.SetFont("DermaDefault")
-        draw.SimpleText("Configuration avancée du serveur", "DermaDefault", 20, 45, Color(200, 200, 200), TEXT_ALIGN_LEFT)
+    settingsMenu.Paint = function(self, w, h)
+        surface.SetDrawColor(COL_BG)
+        surface.DrawRect(0, 0, w, h)
+        surface.SetDrawColor(52, 152, 219, 180)
+        surface.DrawRect(0, 0, w, 3)
+        draw.SimpleText("Paramètres Prop Hunt", "PHSettingsTitle", 24, 18, COL_TEXT)
     end
 
-    -- Créer le système d'onglets
-    local tabPanel = vgui.Create("DPropertySheet", settingsMenu)
-    tabPanel:Dock(FILL)
-    tabPanel:DockMargin(10, 60, 10, 10)
-    tabPanel:SetPadding(5)
+    -- Bouton fermer
+    local closeBtn = vgui.Create("DButton", settingsMenu)
+    closeBtn:SetSize(32, 32)
+    closeBtn:SetText("")
+    closeBtn.Paint = function(self, w, h)
+        surface.SetDrawColor(self:IsHovered() and Color(220, 80, 80) or Color(60, 60, 70))
+        draw.RoundedBox(4, 0, 0, w, h, self:IsHovered() and Color(220, 80, 80) or Color(60, 60, 70))
+        draw.SimpleText("×", "PHSettingsTitle", w / 2, h / 2 - 2, COL_TEXT, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+    end
+    closeBtn.DoClick = function() settingsMenu:Close() end
 
-    -- Style des onglets
-    function tabPanel:Paint(w, h)
-        surface.SetDrawColor(40, 40, 45, 200)
+    settingsMenu.OnSizeChanged = function(self, w, h)
+        closeBtn:SetPos(w - 40, 14)
+    end
+    closeBtn:SetPos(settingsMenu:GetWide() - 40, 14)
+
+    -- Sidebar
+    local sidebar = vgui.Create("DPanel", settingsMenu)
+    sidebar:SetWide(210)
+    sidebar:Dock(LEFT)
+    sidebar:DockMargin(0, 56, 0, 0)
+    sidebar.Paint = function(self, w, h)
+        surface.SetDrawColor(COL_SIDEBAR)
         surface.DrawRect(0, 0, w, h)
     end
 
-    -- Créer les onglets pour chaque catégorie
-    for _, category in ipairs(self.Categories) do
-        local categoryPanel = vgui.Create("DPanel")
-        categoryPanel:DockPadding(15, 15, 15, 15)
+    -- Search
+    local searchEntry = vgui.Create("DTextEntry", sidebar)
+    searchEntry:Dock(TOP)
+    searchEntry:DockMargin(12, 12, 12, 8)
+    searchEntry:SetTall(30)
+    searchEntry:SetFont("PHSettingsValue")
+    searchEntry:SetPlaceholderText("Rechercher…")
+    searchEntry.Paint = function(self, w, h)
+        surface.SetDrawColor(12, 12, 16)
+        draw.RoundedBox(4, 0, 0, w, h, Color(12, 12, 16))
+        self:DrawTextEntryText(COL_TEXT, Color(100, 100, 120), COL_TEXT)
+    end
 
-        -- Style du panneau de catégorie
-        function categoryPanel:Paint(w, h)
-            surface.SetDrawColor(50, 50, 55, 150)
-            surface.DrawRect(0, 0, w, h)
+    -- Content host
+    local content = vgui.Create("DScrollPanel", settingsMenu)
+    content:Dock(FILL)
+    content:DockMargin(16, 56, 16, 56)
+    local sbar = content:GetVBar()
+    sbar:SetWide(6)
+    sbar.Paint = function(s, w, h) surface.SetDrawColor(20, 20, 24) surface.DrawRect(0, 0, w, h) end
+    sbar.btnGrip.Paint = function(s, w, h) draw.RoundedBox(3, 0, 0, w, h, Color(80, 80, 90)) end
+    sbar.btnUp:SetSize(0, 0) sbar.btnDown:SetSize(0, 0)
+
+    local currentCategory = self.Categories[1]
+    local currentCards = {}
+
+    local function renderCategory(cat, filter)
+        currentCategory = cat
+        content:Clear()
+        currentCards = {}
+        filter = (filter or ""):lower()
+
+        local header = vgui.Create("DPanel", content)
+        header:Dock(TOP)
+        header:DockMargin(0, 0, 0, 14)
+        header:SetTall(38)
+        header.Paint = function(self, w, h)
+            draw.SimpleText(cat.name, "PHSettingsTitle", 0, 4, COL_TEXT)
+            surface.SetDrawColor(cat.color)
+            surface.DrawRect(0, h - 2, 40, 2)
         end
 
-        -- Scroll panel pour les paramètres
-        local scrollPanel = vgui.Create("DScrollPanel", categoryPanel)
-        scrollPanel:Dock(FILL)
-
-        -- Style du scroll panel
-        function scrollPanel:Paint(w, h)
-            surface.SetDrawColor(60, 60, 65, 100)
-            surface.DrawRect(0, 0, w, h)
+        for _, s in ipairs(cat.settings) do
+            local match = filter == "" or s.label:lower():find(filter, 1, true) or (s.help and s.help:lower():find(filter, 1, true))
+            if match then
+                local c = buildCard(content, s, cat.color)
+                currentCards[#currentCards + 1] = c
+            end
         end
 
-        -- Créer les contrôles pour chaque paramètre
-        local y = 10
-        for _, setting in ipairs(category.settings) do
-            local controlPanel = vgui.Create("DPanel", scrollPanel)
-            controlPanel:SetPos(10, y)
-            controlPanel:SetSize(scrollPanel:GetWide() - 20, 60)
-            controlPanel:DockMargin(0, 0, 0, 10)
+        if #currentCards == 0 then
+            local nope = vgui.Create("DLabel", content)
+            nope:Dock(TOP)
+            nope:DockMargin(0, 20, 0, 0)
+            nope:SetFont("PHSettingsDesc")
+            nope:SetText("Aucun paramètre ne correspond.")
+            nope:SetTextColor(COL_DIM)
+        end
+    end
 
-            -- Style du panneau de contrôle
-            function controlPanel:Paint(w, h)
-                surface.SetDrawColor(70, 70, 75, 120)
+    searchEntry.OnChange = function(self)
+        renderCategory(currentCategory, self:GetValue())
+    end
+
+    -- Liste des catégories
+    local catList = vgui.Create("DPanel", sidebar)
+    catList:Dock(FILL)
+    catList.Paint = function() end
+
+    local tabButtons = {}
+    for _, cat in ipairs(self.Categories) do
+        local btn = vgui.Create("DButton", catList)
+        btn:Dock(TOP)
+        btn:DockMargin(8, 0, 8, 2)
+        btn:SetTall(34)
+        btn:SetText("")
+        btn.Paint = function(self, w, h)
+            local active = (currentCategory == cat)
+            if active then
+                surface.SetDrawColor(cat.color.r, cat.color.g, cat.color.b, 40)
                 surface.DrawRect(0, 0, w, h)
-                
-                -- Bordure subtile
-                surface.SetDrawColor(category.color.r, category.color.g, category.color.b, 100)
-                surface.DrawOutlinedRect(0, 0, w, h, 1)
+                surface.SetDrawColor(cat.color)
+                surface.DrawRect(0, 0, 3, h)
+            elseif self:IsHovered() then
+                surface.SetDrawColor(40, 40, 50)
+                surface.DrawRect(0, 0, w, h)
             end
-
-            -- Label du paramètre
-            local label = vgui.Create("DLabel", controlPanel)
-            label:SetPos(15, 8)
-            label:SetSize(controlPanel:GetWide() - 30, 20)
-            label:SetText(setting.label)
-            label:SetFont("DermaDefault")
-            label:SetTextColor(Color(255, 255, 255))
-
-            -- Aide contextuelle
-            if setting.help then
-                local helpLabel = vgui.Create("DLabel", controlPanel)
-                helpLabel:SetPos(15, 25)
-                helpLabel:SetSize(controlPanel:GetWide() - 30, 15)
-                helpLabel:SetText(setting.help)
-                helpLabel:SetFont("DermaDefault")
-                helpLabel:SetTextColor(Color(180, 180, 180))
-            end
-
-            -- Contrôle selon le type
-            if setting.type == "bool" then
-                local checkbox = vgui.Create("DCheckBox", controlPanel)
-                checkbox:SetPos(controlPanel:GetWide() - 40, 15)
-                checkbox:SetConVar(setting.name)
-                checkbox:SetSize(20, 20)
-
-                -- Style personnalisé pour la checkbox
-                function checkbox:Paint(w, h)
-                    local checked = self:GetChecked()
-                    surface.SetDrawColor(checked and category.color or Color(100, 100, 100))
-                    surface.DrawRect(0, 0, w, h)
-                    
-                    if checked then
-                        surface.SetDrawColor(255, 255, 255)
-                        surface.DrawRect(2, 2, w-4, h-4)
-                    end
-                end
-
-            elseif setting.type == "int" or setting.type == "float" then
-                local slider = vgui.Create("DNumSlider", controlPanel)
-                slider:SetPos(controlPanel:GetWide() - 200, 10)
-                slider:SetSize(180, 40)
-                slider:SetMin(setting.min or 0)
-                slider:SetMax(setting.max or 100)
-                slider:SetDecimals(setting.decimals or 0)
-                slider:SetConVar(setting.name)
-                slider:SetText("")
-
-                -- Style personnalisé pour le slider
-                function slider:Paint(w, h)
-                    surface.SetDrawColor(80, 80, 85, 150)
-                    surface.DrawRect(0, 0, w, h)
-                end
-
-            elseif setting.type == "string" then
-                local textEntry = vgui.Create("DTextEntry", controlPanel)
-                textEntry:SetPos(controlPanel:GetWide() - 200, 15)
-                textEntry:SetSize(180, 25)
-                textEntry:SetText(GetConVar(setting.name):GetString())
-                textEntry:SetFont("DermaDefault")
-
-                textEntry.OnEnter = function(self)
-                    RunConsoleCommand(setting.name, self:GetValue())
-                end
-
-                -- Style personnalisé pour le text entry
-                function textEntry:Paint(w, h)
-                    surface.SetDrawColor(40, 40, 45, 200)
-                    surface.DrawRect(0, 0, w, h)
-                    
-                    surface.SetDrawColor(category.color.r, category.color.g, category.color.b, 150)
-                    surface.DrawOutlinedRect(0, 0, w, h, 1)
-                end
-            end
-
-            y = y + 70
+            draw.SimpleText(cat.name, "PHSettingsTab", 14, h / 2, active and COL_TEXT or COL_SUB, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
         end
-
-        -- Ajouter l'onglet
-        tabPanel:AddSheet(category.name, categoryPanel, category.icon, false, false, category.help)
+        btn.DoClick = function()
+            searchEntry:SetText("")
+            renderCategory(cat, "")
+        end
+        tabButtons[#tabButtons + 1] = btn
     end
 
-    -- Boutons d'action en bas
-    local buttonPanel = vgui.Create("DPanel", settingsMenu)
-    buttonPanel:Dock(BOTTOM)
-    buttonPanel:SetTall(50)
-    buttonPanel:DockMargin(10, 0, 10, 10)
+    -- Footer : Reset tab + Close
+    local footer = vgui.Create("DPanel", settingsMenu)
+    footer:Dock(BOTTOM)
+    footer:DockMargin(16, 8, 16, 12)
+    footer:SetTall(36)
+    footer.Paint = function() end
 
-    function buttonPanel:Paint(w, h)
-        surface.SetDrawColor(40, 40, 45, 200)
-        surface.DrawRect(0, 0, w, h)
+    local reset = vgui.Create("DButton", footer)
+    reset:Dock(LEFT)
+    reset:SetWide(200)
+    reset:SetText("")
+    reset.Paint = function(self, w, h)
+        local c = self:IsHovered() and Color(70, 70, 80) or Color(40, 40, 48)
+        draw.RoundedBox(4, 0, 0, w, h, c)
+        draw.SimpleText("Restaurer les défauts de cet onglet", "PHSettingsTab", w / 2, h / 2, COL_TEXT, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
     end
-
-    -- Bouton Reset
-    local resetButton = vgui.Create("DButton", buttonPanel)
-    resetButton:SetPos(10, 10)
-    resetButton:SetSize(120, 30)
-    resetButton:SetText("🔄 Réinitialiser")
-    resetButton:SetFont("DermaDefault")
-
-    function resetButton:Paint(w, h)
-        local col = self:IsHovered() and Color(231, 76, 60) or Color(52, 152, 219)
-        surface.SetDrawColor(col.r, col.g, col.b, 200)
-        surface.DrawRect(0, 0, w, h)
-        
-        surface.SetDrawColor(255, 255, 255, 100)
-        surface.DrawOutlinedRect(0, 0, w, h, 1)
-    end
-
-    function resetButton:DoClick()
-        Derma_Query("Êtes-vous sûr de vouloir réinitialiser tous les paramètres ?", "Confirmation", "Oui", function()
-            -- Réinitialiser tous les paramètres
-            for _, category in ipairs(ModernSettings.Categories) do
-                for _, setting in ipairs(category.settings) do
-                    local convar = GetConVar(setting.name)
-                    if convar then
-                        RunConsoleCommand(setting.name, convar:GetDefault())
-                    end
+    reset.DoClick = function()
+        Derma_Query(
+            string.format("Restaurer les valeurs par défaut de l'onglet '%s' ?", currentCategory.name),
+            "Confirmation",
+            "Oui", function()
+                for _, s in ipairs(currentCategory.settings) do
+                    local cv = GetConVar(s.name)
+                    if cv then RunConsoleCommand(s.name, cv:GetDefault()) end
                 end
-            end
-            settingsMenu:Close()
-        end, "Non")
+                renderCategory(currentCategory, searchEntry:GetValue())
+            end,
+            "Non"
+        )
     end
 
-    -- Bouton Appliquer
-    local applyButton = vgui.Create("DButton", buttonPanel)
-    applyButton:SetPos(buttonPanel:GetWide() - 130, 10)
-    applyButton:SetSize(120, 30)
-    applyButton:SetText("✅ Appliquer")
-    applyButton:SetFont("DermaDefault")
-
-    function applyButton:Paint(w, h)
-        local col = self:IsHovered() and Color(46, 204, 113) or Color(52, 152, 219)
-        surface.SetDrawColor(col.r, col.g, col.b, 200)
-        surface.DrawRect(0, 0, w, h)
-        
-        surface.SetDrawColor(255, 255, 255, 100)
-        surface.DrawOutlinedRect(0, 0, w, h, 1)
+    local close = vgui.Create("DButton", footer)
+    close:Dock(RIGHT)
+    close:SetWide(120)
+    close:SetText("")
+    close.Paint = function(self, w, h)
+        local c = self:IsHovered() and Color(60, 130, 200) or Color(52, 152, 219)
+        draw.RoundedBox(4, 0, 0, w, h, c)
+        draw.SimpleText("Fermer", "PHSettingsTab", w / 2, h / 2, COL_TEXT, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
     end
+    close.DoClick = function() settingsMenu:Close() end
 
-    function applyButton:DoClick()
-        -- Les changements sont appliqués automatiquement via les ConVars
-        settingsMenu:Close()
-    end
-
+    -- Init
+    renderCategory(self.Categories[1], "")
     return settingsMenu
 end
 
--- Fonction pour ouvrir/fermer le menu
 function ModernSettings:ToggleMenu()
     if not IsValid(settingsMenu) then
         self:CreateMenu()
+    else
+        settingsMenu:SetVisible(not settingsMenu:IsVisible())
+        if settingsMenu:IsVisible() then settingsMenu:MakePopup() end
     end
-    settingsMenu:SetVisible(not settingsMenu:IsVisible())
 end
 
--- Exporter le module
 _G.ModernSettings = ModernSettings
 
--- Remplacer l'ancien système
-local function toggleHelpMenu()
-    ModernSettings:ToggleMenu()
-end
-
--- Remplacer la réception du réseau
-net.Receive("ph_openhelpmenu", toggleHelpMenu)
+net.Receive("ph_openhelpmenu", function() ModernSettings:ToggleMenu() end)

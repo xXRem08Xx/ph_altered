@@ -13,9 +13,6 @@ end
 util.AddNetworkString("clientIPE")
 util.AddNetworkString("ph_openhelpmenu")
 util.AddNetworkString("player_model_sex")
-util.AddNetworkString("ph_taunt_3d")
-util.AddNetworkString("ph_death_sound_3d")
-util.AddNetworkString("ph_disguise_sound_3d")
 
 include("sv_chatmsg.lua")
 include("shared.lua")
@@ -37,6 +34,7 @@ include("sv_taunt_diagnostics.lua")
 include("sv_mapvote.lua")
 include("sv_bannedmodels.lua")
 include("sv_version.lua")
+include("sv_classes.lua")
 include("sh_init.lua")
 
 resource.AddFile("materials/husklesph/skull.png")

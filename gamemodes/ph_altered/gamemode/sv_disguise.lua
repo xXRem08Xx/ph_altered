@@ -223,6 +223,14 @@ function PlayerMeta:DisguiseUnlockRotation()
 	GAMEMODE:PlayerSetHull(self, hullxy, hullxy, hullz, hullz)
 end
 
+hook.Add("PlayerDisconnected", "PH_CleanupDisguiseEntity", function(ply)
+	if not IsValid(ply) then return end
+	local dent = ply:GetNWEntity("disguiseEntity")
+	if IsValid(dent) then
+		SafeRemoveEntity(dent)
+	end
+end)
+
 concommand.Add("ph_lockrotation", function(ply, com, args)
 	if !IsValid(ply) then return end
 	if !ply:IsDisguised() then return end

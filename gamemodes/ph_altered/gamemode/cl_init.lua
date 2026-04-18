@@ -22,6 +22,8 @@ include("cl_ui_notifications.lua")
 include("cl_ui_shortcuts.lua")
 include("cl_taunt_validation.lua")
 include("cl_modern_settings.lua")
+include("cl_classes.lua")
+include("cl_class_select.lua")
 include("sh_init.lua")
 
 function GM:InitPostEntity()

@@ -224,10 +224,17 @@ function GM:DrawRoundTimer()
 			draw.ShadowText("Waiting for more players to join", "RobotoHUD-15", ScrW() / 2, ScrH() / 10, color_white, 1, 1)
 		end
 	elseif self:GetGameState() == ROUND_HIDE then
-		local time = math.ceil(self.HidingTime:GetInt() - self:GetStateRunningTime())
-		if time > 0 then
-			draw.ShadowText("Hunters will be released in", "RobotoHUD-15", ScrW() / 2, ScrH() / 3 - draw.GetFontHeight("RobotoHUD-40") / 2, color_white, 1, 4)
-			draw.ShadowText(time, "RobotoHUD-40", ScrW() / 2, ScrH() / 3, color_white, 1, 1)
+		if GetGlobalBool("ph_hide_locked", false) then
+			local pending = GetGlobalInt("ph_hide_picks_pending", 0)
+			draw.ShadowText("En attente des choix de classe", "RobotoHUD-15", ScrW() / 2, ScrH() / 3 - draw.GetFontHeight("RobotoHUD-40") / 2, color_white, 1, 4)
+			draw.ShadowText(tostring(pending), "RobotoHUD-40", ScrW() / 2, ScrH() / 3, color_white, 1, 1)
+			draw.ShadowText("joueur" .. (pending > 1 and "s" or "") .. " restant" .. (pending > 1 and "s" or ""), "RobotoHUD-15", ScrW() / 2, ScrH() / 3 + draw.GetFontHeight("RobotoHUD-40") / 2, color_white, 1, 4)
+		else
+			local time = math.ceil(self.HidingTime:GetInt() - self:GetStateRunningTime())
+			if time > 0 then
+				draw.ShadowText("Hunters will be released in", "RobotoHUD-15", ScrW() / 2, ScrH() / 3 - draw.GetFontHeight("RobotoHUD-40") / 2, color_white, 1, 4)
+				draw.ShadowText(time, "RobotoHUD-40", ScrW() / 2, ScrH() / 3, color_white, 1, 1)
+			end
 		end
 	elseif self:GetGameState() == ROUND_SEEK then
 		if self:GetStateRunningTime() < 2 then
