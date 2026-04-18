@@ -4,6 +4,7 @@ GM.VoiceHearDead = CreateConVar("ph_voice_heardead", 1, bit.bor(FCVAR_ARCHIVE, F
 GM.DeadSpectateRoam = CreateConVar("ph_dead_canroam", 0, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Can dead players use the roam spectate mode")
 
 GM.RoundLimit = CreateConVar("ph_roundlimit", 10, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Number of rounds before mapvote")
+GM.RoundLimitFullMatch = CreateConVar("ph_roundlimit_full_match", 1, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "1 = 1 round = les 2 équipes ont joué (1 match complet). 0 = legacy : chaque swap compte")
 GM.RoundTime = CreateConVar("ph_roundtime", 0, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Time limit before ending the round (0 for automatic time)")
 GM.StartWaitTime = CreateConVar("ph_mapstartwait", 30, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Number of seconds to wait for players on map start before starting round")
 GM.HidingTime = CreateConVar("ph_hidingtime", 30, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Time before hunters are released")

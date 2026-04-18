@@ -146,7 +146,14 @@ function PlayerMeta:DisguiseAsProp(ent)
 	self:SetViewOffset(offset)
 	self:SetViewOffsetDucked(offset)
 
-	self:EmitSound("weapons/bugbait/bugbait_squeeze" .. math.random(1, 3) .. ".wav")
+	-- Utiliser le système de spatialisation audio 3D pour le son de déguisement
+	local disguiseSound = "weapons/bugbait/bugbait_squeeze" .. math.random(1, 3) .. ".wav"
+	if AudioSpatialization then
+		AudioSpatialization:EmitDisguiseSound3D(self, disguiseSound, 0.8, 100)
+	else
+		-- Fallback vers l'ancien système
+		self:EmitSound(disguiseSound)
+	end
 	self.LastDisguise = CurTime()
 
 	local eff = EffectData()
@@ -215,6 +222,14 @@ function PlayerMeta:DisguiseUnlockRotation()
 	self:SetNWBool("disguiseRotationLock", false)
 	GAMEMODE:PlayerSetHull(self, hullxy, hullxy, hullz, hullz)
 end
+
+hook.Add("PlayerDisconnected", "PH_CleanupDisguiseEntity", function(ply)
+	if not IsValid(ply) then return end
+	local dent = ply:GetNWEntity("disguiseEntity")
+	if IsValid(dent) then
+		SafeRemoveEntity(dent)
+	end
+end)
 
 concommand.Add("ph_lockrotation", function(ply, com, args)
 	if !IsValid(ply) then return end

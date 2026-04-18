@@ -17,6 +17,19 @@ function PlayerMeta:CanTaunt()
 end
 
 function PlayerMeta:EmitTaunt(filename, durationOverride)
+	-- Utiliser le système de correction des taunts
+	if TauntFix then
+		local success = TauntFix:EmitTauntSafe(self, filename, durationOverride)
+		if success then
+			return
+		else
+			-- Si le taunt a échoué, ne pas bloquer le joueur
+			print("[TauntFix] Taunt échoué pour " .. self:Nick() .. " - son: " .. filename)
+			return
+		end
+	end
+	
+	-- Fallback vers l'ancien système si TauntFix n'est pas disponible
 	local duration = SoundDuration(filename)
 	if filename:match("%.mp3$") then
 		duration = durationOverride || 1
@@ -24,7 +37,14 @@ function PlayerMeta:EmitTaunt(filename, durationOverride)
 
 	local sndName = FilenameToSoundname(filename)
 
-	self:EmitSound(sndName)
+	-- Utiliser le système de spatialisation audio 3D
+	if AudioSpatialization then
+		AudioSpatialization:EmitTaunt3D(self, sndName, 1.0, 100)
+	else
+		-- Fallback vers l'ancien système
+		self:EmitSound(sndName)
+	end
+	
 	self.TauntEnd = CurTime() + duration + 0.1
 	self.TauntAmount = (self.TauntAmount || 0) + 1
 	self.AutoTauntDeadline = nil

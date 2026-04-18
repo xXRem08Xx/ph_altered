@@ -3,6 +3,15 @@
 util.AddNetworkString("ph_mapvote")
 util.AddNetworkString("ph_mapvotevotes")
 
+CreateConVar("ph_mapvote_choices", "6", bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY),
+    "Nombre de maps proposées au vote (0 = toutes)")
+CreateConVar("ph_mapvote_exclude_current", "1", bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY),
+    "Exclure la map courante des choix de vote")
+CreateConVar("ph_mapvote_recent_size", "3", bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY),
+    "Nombre de maps récemment jouées à exclure du vote (0 = aucune)")
+CreateConVar("ph_mapvote_time", "30", bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY),
+    "Durée du vote de map en secondes")
+
 GM.MapVoteTime = GAMEMODE && GAMEMODE.MapVoteTime || 30
 GM.MapVoteStart = GAMEMODE && GAMEMODE.MapVoteStart || CurTime()
 
@@ -19,9 +28,10 @@ function GM:GetMapVoteRunningTime()
 end
 
 function GM:RotateMap()
+	local list = self:GetFullMapList()
 	local map = game.GetMap()
 	local index
-	for k, map2 in pairs(self.MapList) do
+	for k, map2 in pairs(list) do
 		if map == map2 then
 			index = k
 		end
@@ -30,20 +40,24 @@ function GM:RotateMap()
 	if !index then index = 1 end
 	index = index + 1
 
-	if index > #self.MapList then
+	if index > #list then
 		index = 1
 	end
 
-	local nextMap = self.MapList[index]
+	local nextMap = list[index]
 	self:ChangeMapTo(nextMap)
 end
 
 function GM:ChangeMapTo(map)
 	if map == game.GetMap() then
 		self.Rounds = 0
+		self.SetupCount = 0
 		self:SetGameState(ROUND_WAIT)
 		return
 	end
+
+	-- Persiste la map courante dans l'historique récent
+	self:PushRecentMap(game.GetMap())
 
 	print("[ph_altered] Rotate changing map to " .. map)
 	GlobalChatMsg("Changing map to ", map)
@@ -51,6 +65,32 @@ function GM:ChangeMapTo(map)
 	timer.Simple(5, function()
 		RunConsoleCommand("changelevel", map)
 	end)
+end
+
+function GM:PushRecentMap(map)
+	if not map or map == "" then return end
+	local size = GetConVar("ph_mapvote_recent_size"):GetInt()
+	if size <= 0 then return end
+	local tbl = {}
+	local raw = file.Read("ph_altered/recentmaps.txt", "DATA") or ""
+	for line in raw:gmatch("[^\r\n]+") do tbl[#tbl + 1] = line end
+	-- Retire les doublons
+	for i = #tbl, 1, -1 do
+		if tbl[i] == map then table.remove(tbl, i) end
+	end
+	table.insert(tbl, 1, map)
+	-- Tronque
+	while #tbl > size do table.remove(tbl) end
+	if not file.Exists("ph_altered", "DATA") then file.CreateDir("ph_altered") end
+	file.Write("ph_altered/recentmaps.txt", table.concat(tbl, "\r\n"))
+	self.RecentMaps = tbl
+end
+
+function GM:LoadRecentMaps()
+	local tbl = {}
+	local raw = file.Read("ph_altered/recentmaps.txt", "DATA") or ""
+	for line in raw:gmatch("[^\r\n]+") do tbl[#tbl + 1] = line end
+	self.RecentMaps = tbl
 end
 
 GM.MapList = {}
@@ -108,6 +148,10 @@ function GM:LoadMapList()
 		self:SaveMapList()
 	end
 
+	-- Copie "canon" pour le mapvote (self.MapList est réduit pendant le vote)
+	self._FullMapList = table.Copy(self.MapList)
+	self:LoadRecentMaps()
+
 	for k, map in pairs(self.MapList) do
 		local path = "maps/" .. map .. ".png"
 		if file.Exists(path, "GAME") then
@@ -132,19 +176,55 @@ function GM:StartMapVote()
 	end
 
 	self.MapVoteStart = CurTime()
-	self.MapVoteTime = 30
+	self.MapVoteTime = GetConVar("ph_mapvote_time"):GetInt()
 	self.MapVoting = true
 	self.MapVotes = {}
 
-	-- randomise the order of maps so people choose different ones
-	local maps = {}
-	for k, v in pairs(self.MapList) do
-		table.insert(maps, math.random(#maps) + 1, v)
+	-- Sélection des maps candidates : exclure la map courante + maps récentes
+	local currentMap = game.GetMap()
+	local excludeCurrent = GetConVar("ph_mapvote_exclude_current"):GetBool()
+	local recent = self.RecentMaps or {}
+	local recentSet = {}
+	for _, m in ipairs(recent) do recentSet[m] = true end
+
+	local pool = {}
+	for _, m in ipairs(self:GetFullMapList()) do
+		if excludeCurrent and m == currentMap then continue end
+		if recentSet[m] then continue end
+		pool[#pool + 1] = m
 	end
 
-	self.MapList = maps
+	-- Si le filtre vide le pool (petit serveur), fallback sur la liste complète sans map courante
+	if #pool == 0 then
+		for _, m in ipairs(self:GetFullMapList()) do
+			if not excludeCurrent or m ~= currentMap then
+				pool[#pool + 1] = m
+			end
+		end
+	end
+	if #pool == 0 then pool = table.Copy(self:GetFullMapList()) end
+
+	-- Mélange
+	for i = #pool, 2, -1 do
+		local j = math.random(i)
+		pool[i], pool[j] = pool[j], pool[i]
+	end
+
+	-- Cap au nombre de choix voulu
+	local cap = GetConVar("ph_mapvote_choices"):GetInt()
+	if cap > 0 and #pool > cap then
+		local reduced = {}
+		for i = 1, cap do reduced[i] = pool[i] end
+		pool = reduced
+	end
+
+	self.MapList = pool
 	self:SetGameState(ROUND_MAPVOTE)
 	self:NetworkMapVoteStart()
+end
+
+function GM:GetFullMapList()
+	return self._FullMapList or self.MapList
 end
 
 function GM:MapVoteThink()
@@ -175,9 +255,18 @@ function GM:MapVoteThink()
 			if #maps > 0 then
 				self:ChangeMapTo(table.Random(maps))
 			else
-				GlobalChatMsg("Map change failed, not enough votes")
-				print("Map change failed, not enough votes")
-				self:SetGameState(ROUND_WAIT)
+				-- Aucun vote : on prend un choix aléatoire parmi les maps proposées
+				-- pour éviter une boucle infinie mapvote → WAIT → mapvote.
+				if #self.MapList > 0 then
+					local fallback = table.Random(self.MapList)
+					GlobalChatMsg("Aucun vote : map suivante tirée au hasard — ", fallback)
+					self:ChangeMapTo(fallback)
+				else
+					GlobalChatMsg("Map change failed, no maps available")
+					self.Rounds = 0
+					self.SetupCount = 0
+					self:SetGameState(ROUND_WAIT)
+				end
 			end
 		end
 	end

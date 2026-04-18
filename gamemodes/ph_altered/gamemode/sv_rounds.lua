@@ -7,10 +7,18 @@ util.AddNetworkString("gamerules")
 GM.GameState = GAMEMODE && GAMEMODE.GameState || ROUND_WAIT
 GM.StateStart = GAMEMODE && GAMEMODE.StateStart || CurTime()
 GM.Rounds = GAMEMODE && GAMEMODE.Rounds || 0
+GM.SetupCount = GAMEMODE && GAMEMODE.SetupCount || 0
 
 local function mapTimeLimitTimerResult()
-	if GAMEMODE.Rounds < GAMEMODE.RoundLimit:GetInt() then -- Only change if we haven't already hit the round limit
-		GAMEMODE.Rounds = GAMEMODE.RoundLimit:GetInt() - 1 -- Allows for 1 extra round before hitting the limit
+	-- Force le prochain round à être le dernier : place le compteur à RoundLimit - 1.
+	if GAMEMODE.Rounds < GAMEMODE.RoundLimit:GetInt() then
+		local target = GAMEMODE.RoundLimit:GetInt() - 1
+		if GAMEMODE.RoundLimitFullMatch:GetBool() then
+			GAMEMODE.SetupCount = target * 2
+		else
+			GAMEMODE.SetupCount = target
+		end
+		GAMEMODE.Rounds = target
 	end
 end
 
@@ -104,8 +112,8 @@ end
 
 function GM:SetupRound()
 	local c = 0
-	for k, ply in pairs(player.GetAll()) do
-		if not ply:IsSpectator() then
+	for _, ply in ipairs(player.GetHumans()) do
+		if IsValid(ply) and not ply:IsSpectator() then
 			c = c + 1
 		end
 	end
@@ -115,7 +123,8 @@ function GM:SetupRound()
 		return
 	end
 	self:BalanceTeams()
-	for k, ply in pairs(player.GetAll()) do
+	for _, ply in ipairs(player.GetHumans()) do
+		if not IsValid(ply) then continue end
 		if not ply:IsSpectator() then
 			ply:SetNWBool("RoundInGame", true)
 			ply:KillSilent()
@@ -141,8 +150,14 @@ function GM:SetupRound()
 		end
 	end
 	self:CleanupMap()
-	self.Rounds = self.Rounds + 1
-	if self.Rounds == self.RoundLimit:GetInt() then
+	self.SetupCount = (self.SetupCount or 0) + 1
+	if self.RoundLimitFullMatch:GetBool() then
+		-- 1 round = 2 setups (1 match complet : les 2 équipes ont joué)
+		self.Rounds = math.ceil(self.SetupCount / 2)
+	else
+		self.Rounds = self.SetupCount
+	end
+	if self.RoundLimit:GetInt() > 0 and self.Rounds >= self.RoundLimit:GetInt() then
 		GlobalChatMsg(Color(255, 0, 0), "This is the LAST ROUND!")
 		if self.Secrets:GetBool() then
 			BroadcastLua("surface.PlaySound('husklesph/hphaaaaa2.mp3')")
@@ -150,6 +165,7 @@ function GM:SetupRound()
 	end
 	hook.Run("OnSetupRound")
 	self:SetGameState(ROUND_HIDE)
+	hook.Run("OnRoundHide")
 end
 
 function GM:StartRound()
@@ -187,6 +203,7 @@ function GM:StartRound()
 	print("Round time is " .. (self.RoundSettings.RoundTime / 60) .. " (" .. c .. " props)")
 	self:NetworkGameSettings()
 	self:SetGameState(ROUND_SEEK)
+	hook.Run("OnRoundSeek")
 	GlobalChatMsg("Round has started")
 end
 
@@ -276,6 +293,10 @@ function GM:RoundsThink()
 			self:SetupRound()
 		end
 	elseif self:GetGameState() == ROUND_HIDE then
+		if GetGlobalBool("ph_hide_locked", false) then
+			-- En attente des picks de classe — on ne fait rien tant que tout le monde n'a pas choisi.
+			return
+		end
 		if self:GetStateRunningTime() > self.HidingTime:GetInt() then
 			self:StartRound()
 		end
