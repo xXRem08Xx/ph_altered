@@ -5,10 +5,10 @@ local TauntFix = {}
 
 -- Configuration du système de correction
 TauntFix.Config = {
-    -- Délai maximum pour considérer un taunt comme échoué
-    MaxTauntDuration = 10,
+    -- Durée max d'un taunt (bornage + seuil de détection "bloqué")
+    MaxTauntDuration = 8,
     -- Délai de vérification des taunts bloqués
-    CheckInterval = 1,
+    CheckInterval = 0.5,
     -- Nombre maximum de tentatives de retry
     MaxRetries = 3,
     -- Délai entre les tentatives
@@ -16,19 +16,20 @@ TauntFix.Config = {
 }
 
 -- Fonction pour vérifier si un son existe et est valide
+-- Note : SoundDuration renvoie 0 pour les MP3 (bug connu du moteur Source),
+-- on ne peut donc PAS l'utiliser comme preuve d'inexistence.
 function TauntFix:IsSoundValid(filename)
     if not filename or filename == "" then return false end
-    
-    -- Vérifier si le fichier son existe
-    local soundName = FilenameToSoundname(filename)
-    local duration = SoundDuration(filename)
-    
-    -- Si la durée est 0 ou très courte, le son n'existe probablement pas
-    if duration <= 0 then return false end
-    
-    -- Vérifier si le son est dans la liste des sons autorisés
+
+    -- Le filename doit être enregistré via addTaunt/sound.Add
     if not AllowedTauntSounds[filename] then return false end
-    
+
+    -- Vérification stricte : le fichier doit exister sur le disque serveur,
+    -- sinon le son ne sera joué pour personne (et SoundDuration mentira).
+    if not file.Exists("sound/" .. filename, "GAME") then
+        return false
+    end
+
     return true
 end
 
@@ -42,13 +43,26 @@ function TauntFix:EmitTauntSafe(ply, filename, durationOverride)
         return false
     end
     
-    -- SoundDuration renvoie 0 pour les MP3 (bug connu Source) : on fait confiance
-    -- à durationOverride pour les mp3, sinon à SoundDuration.
+    -- SoundDuration renvoie 0 pour les MP3 (bug connu Source).
+    -- Pour les WAV : on fait confiance à SoundDuration.
+    -- Pour les MP3 : durationOverride (du addTaunt) ou un défaut prudent.
     local duration = SoundDuration(filename)
-    if filename:match("%.mp3$") or duration <= 0 then
-        duration = durationOverride or duration
-        if not duration or duration <= 0 then duration = 3 end
+    local isMp3 = filename:match("%.mp3$") ~= nil
+
+    if isMp3 or duration <= 0 then
+        -- Priorité au override explicite passé via addTaunt(..., duration)
+        if durationOverride and durationOverride > 0 then
+            duration = durationOverride
+        else
+            -- Défaut conservateur : on préfère débloquer trop tôt (le son continue
+            -- de jouer côté client) que trop tard. 4s convient à la plupart des
+            -- voice-lines. Utiliser addTaunt(..., dureeEnSecondes) pour overrider.
+            duration = 4
+        end
     end
+
+    -- Sanity bounds (évite les durations absurdes)
+    duration = math.Clamp(duration, 0.5, self.Config.MaxTauntDuration)
 
     local sndName = FilenameToSoundname(filename)
 
@@ -220,9 +234,25 @@ end)
 -- Commande pour débloquer un joueur
 concommand.Add("ph_taunt_unblock", function(ply, cmd, args)
     if not IsValid(ply) then return end
-    
+
     TauntFix:UnblockPlayer(ply)
     ply:ChatPrint("Taunt débloqué !")
+end)
+
+-- Alias court "annule mon taunt en cours" (utilisable sans notion de timer)
+concommand.Add("ph_taunt_cancel", function(ply, cmd, args)
+    if not IsValid(ply) then return end
+    if ply.TauntEnd and ply.TauntEnd > CurTime() then
+        -- Coupe le son côté clients
+        if ply.TauntsUsed then
+            for soundName, _ in pairs(ply.TauntsUsed) do
+                ply:StopSound(soundName)
+            end
+        end
+        ply.TauntEnd = nil
+        ply.AutoTauntDeadline = nil
+        timer.Remove("taunt_safety_" .. ply:SteamID())
+    end
 end)
 
 -- Commande pour diagnostiquer les problèmes

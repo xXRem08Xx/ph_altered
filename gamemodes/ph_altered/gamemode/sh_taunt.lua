@@ -74,8 +74,31 @@ local function addTaunt(name, snd, pteam, sex, cats, duration, allowedModels)
 	if type(snd) != "table" then snd = {tostring(snd)} end
 	if #snd == 0 then error("No sounds for " .. name) return end
 
+	-- Validation des fichiers son : on retire les sons absents pour ne pas
+	-- casser l'aléatoire (un taunt qui tire un son inexistant = silence + blocage timer).
+	local validSnd = {}
+	for _, v in ipairs(snd) do
+		if file.Exists("sound/" .. v, "GAME") then
+			validSnd[#validSnd + 1] = v
+		else
+			local s = SERVER and "[SV]" or "[CL]"
+			MsgC(Color(255, 80, 80), s .. " [Taunt] Fichier son MANQUANT, ignoré : " .. v .. " (taunt \"" .. name .. "\")\n")
+			if SERVER then
+				-- Même si le fichier manque sur le serveur, on tente un AddFile
+				-- au cas où un client aurait le fichier via un addon workshop.
+				-- Mais on ne l'ajoute pas au pool jouable pour éviter les silences.
+				resource.AddFile("sound/" .. v)
+			end
+		end
+	end
+
+	if #validSnd == 0 then
+		MsgC(Color(255, 80, 80), "[Taunt] Taunt \"" .. name .. "\" IGNORÉ (aucun son valide)\n")
+		return
+	end
+
 	local t = {}
-	t.sound = snd
+	t.sound = validSnd
 	t.categories = cats
 	if type(pteam) == "string" then
 		t.team = teamNameToNum(pteam)
@@ -96,7 +119,7 @@ local function addTaunt(name, snd, pteam, sex, cats, duration, allowedModels)
 	t.allowedModels = allowedModels
 
 	local dur, count = 0, 0
-	for k, v in pairs(snd) do
+	for k, v in pairs(validSnd) do
 		sound.Add({
 			name = FilenameToSoundname(v),
 			channel = CHAN_AUTO,
@@ -106,8 +129,14 @@ local function addTaunt(name, snd, pteam, sex, cats, duration, allowedModels)
 
 		if !AllowedTauntSounds[v] then AllowedTauntSounds[v] = {} end
 		table.insert(AllowedTauntSounds[v], t)
-		dur = dur + SoundDuration(v)
-		count = count + 1
+
+		local sd = SoundDuration(v)
+		-- MP3 : SoundDuration est menteur (toujours 0). On compte seulement les WAV
+		-- pour la moyenne affichée, et on fallback sur le paramètre duration.
+		if sd > 0 then
+			dur = dur + sd
+			count = count + 1
+		end
 
 		if SERVER then
 			-- network the taunt
@@ -115,7 +144,7 @@ local function addTaunt(name, snd, pteam, sex, cats, duration, allowedModels)
 		end
 	end
 
-	t.soundDuration = dur / count
+	t.soundDuration = count > 0 and (dur / count) or (tonumber(duration) or 3)
 	if tonumber(duration) then
 		t.soundDuration = tonumber(duration)
 		t.soundDurationOverride = tonumber(duration)

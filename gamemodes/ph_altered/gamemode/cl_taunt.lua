@@ -244,6 +244,12 @@ end
 concommand.Add("ph_menu_taunt", openTauntMenu)
 net.Receive("open_taunt_menu", openTauntMenu)
 
+-- Raccourci : proxy client → serveur pour annuler son taunt en cours.
+-- Permet de relancer un taunt immédiatement si le son n'a pas joué chez soi.
+concommand.Add("ph_taunt_cancel_client", function()
+	RunConsoleCommand("ph_taunt_cancel")
+end)
+
 net.Receive("ph_set_taunt_menu_phrase", function()
 	value_new = net.ReadString()
 
