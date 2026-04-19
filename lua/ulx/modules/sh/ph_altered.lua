@@ -190,3 +190,29 @@ commandToUlx("ph_audio_spatialization", function(c)
     c:addParam{ type = ULib.cmds.BoolArg, hint = "enabled", ULib.cmds.optional }
     c:help("Enable/disable enhanced 3D audio spatialization.")
 end)
+
+-- Upstream movement / fall damage commands
+commandToUlx("ph_walk_speed", function(c)
+    c:addParam{ type = ULib.cmds.NumArg, default = 250, min = 10, max = 1000, hint = "walk", ULib.cmds.optional }
+    c:help("Set the default walk speed for hunters and props.")
+end)
+
+commandToUlx("ph_run_speed", function(c)
+    c:addParam{ type = ULib.cmds.NumArg, default = 50, min = 10, max = 1000, hint = "run", ULib.cmds.optional }
+    c:help("Set the default run speed for hunters and props.")
+end)
+
+commandToUlx("ph_jump_power", function(c)
+    c:addParam{ type = ULib.cmds.NumArg, default = 200, min = 10, max = 1000, hint = "jump", ULib.cmds.optional }
+    c:help("Set the default jump power for hunters and props.")
+end)
+
+commandToUlx("ph_falldmg_mult", function(c)
+    c:addParam{ type = ULib.cmds.NumArg, default = 50, min = 0, max = 1000, hint = "falldmg", ULib.cmds.optional }
+    c:help("Adjust fall damage for hunters and props.")
+end)
+
+commandToUlx("ph_falldmg_nonlethal", function(c)
+    c:addParam{ type = ULib.cmds.BoolArg, hint = "enabled", ULib.cmds.optional }
+    c:help("Set fall damage lethality.")
+end)

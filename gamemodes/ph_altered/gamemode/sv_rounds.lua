@@ -216,6 +216,10 @@ function GM:EndRound(winningTeam)
 
 	self.LastRoundResult = winningTeam
 
+	-- Upstream addon hooks
+	hook.Run("PH" .. winningTeam)
+	hook.Run("PHEndRound", winningTeam)
+
 	local awards = {}
 	for awardKey, award in pairs(PlayerAwards) do -- PlayerAwards comes from sv_awards.lua
 		local result = award.getWinner()
@@ -223,13 +227,14 @@ function GM:EndRound(winningTeam)
 		-- nil values cannot exist in awards otherwise the net.WriteTable below will break
 		if !result then
 			continue
-		elseif type(result) == "Player" then
+		elseif type(result) == "Player" and IsValid(result) then
 			awards[awardKey] = {
 				name = award.name,
 				desc = award.desc,
 				winnerName = result:Nick(),
 				winnerTeam = result:Team()
 			}
+			hook.Run("PHAward", result, award)
 		else
 			ErrorNoHalt("ph_altered WARNING: EndRound Player Award gave non Player object: " .. type(result))
 		end

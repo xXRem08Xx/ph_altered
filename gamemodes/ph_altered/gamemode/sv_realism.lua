@@ -21,7 +21,8 @@ end
 function GM:GetFallDamage(ply, vel)
 	if vel > 530 then
 		local minvel = vel - 530
-		local dmg = math.ceil(minvel / 278 * 50)
+		local dmg = math.ceil(minvel / 278 * GAMEMODE.FallDMGMult:GetInt())
+		if GAMEMODE.FallDMGNonLethal:GetBool() && ply:Health() <= dmg then dmg = ply:Health() - 1 end
 		return dmg
 	end
 end

@@ -62,14 +62,17 @@ function GM:PlayerSetHull(ply, hullx, hully, hullz, duckz)
 end
 
 function GM:EntityEmitSound( t )
-	if GetConVar("ph_hunter_deaf_onhiding"):GetBool() && self:GetGameState() == ROUND_HIDE then
-		for _, ply in pairs(player.GetAll()) do
-			if ply:IsHunter() then
-				return false
-			else
-				return nil
-			end
+	-- Upstream fix: early-return clean pattern, ignore bots
+	if not GetConVar("ph_hunter_deaf_onhiding"):GetBool() or self:GetGameState() ~= ROUND_HIDE then
+		return
+	end
+
+	for _, ply in ipairs(player.GetHumans()) do
+		if not ply:IsHunter() then
+			continue
 		end
+
+		return false
 	end
 end
 

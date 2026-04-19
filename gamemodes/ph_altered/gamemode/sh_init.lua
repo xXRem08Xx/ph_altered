@@ -38,3 +38,10 @@ GM.Secrets =  CreateConVar("ph_secrets", 0, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY,
 -- random props
 GM.RandomChangeProps = CreateConVar("ph_random_prop_mode", 0, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Enable random prop mode")
 GM.RandomPropLimit = CreateConVar("ph_random_prop_limit", 3, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Number of random props allowed per round")
+
+-- Movement / fall damage (from upstream)
+GM.WalkSpeed = CreateConVar("ph_walk_speed", 250, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Walk Speed")
+GM.RunSpeed = CreateConVar("ph_run_speed", 50, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Run Speed") -- Lower than walk speed so you walk even slower but without emitting footsteps
+GM.JumpPower = CreateConVar("ph_jump_power", 200, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Jump Power")
+GM.FallDMGMult = CreateConVar("ph_falldmg_mult", 50, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Adjust fall damage")
+GM.FallDMGNonLethal = CreateConVar("ph_falldmg_nonlethal", 0, bit.bor(FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED, FCVAR_SERVER_CAN_EXECUTE), "Should fall damage kill")

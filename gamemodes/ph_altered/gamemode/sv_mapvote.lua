@@ -175,6 +175,13 @@ function GM:StartMapVote()
 		return
 	end
 
+	-- allow developers to override builtin mapvote (upstream)
+	if hook.GetTable().PHStartMapVote then
+		self:SetGameState(ROUND_MAPVOTE)
+		hook.Run("PHStartMapVote")
+		return
+	end
+
 	self.MapVoteStart = CurTime()
 	self.MapVoteTime = GetConVar("ph_mapvote_time"):GetInt()
 	self.MapVoting = true
